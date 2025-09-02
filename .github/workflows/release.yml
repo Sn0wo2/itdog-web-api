@@ -23,7 +23,7 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org
 
-      - name: Get version from git tag
+      - name: Set version from git
         run: |
           VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
           echo "Setting version to: $VERSION"
