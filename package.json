@@ -57,8 +57,5 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.41.0"
   },
-  "private": false,
-  "files": [
-    "dist"
-  ]
+  "private": false
 }
