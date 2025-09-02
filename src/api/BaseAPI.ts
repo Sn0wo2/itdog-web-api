@@ -23,7 +23,7 @@ export interface APIResult {
     [key: string]: unknown;
 }
 
-export abstract class BaseAPI<T = any, R = APIResult> {
+export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
     protected wsHandler: WebSocketHandler;
     protected options: ClientOptions;
     protected config: APIConfig;

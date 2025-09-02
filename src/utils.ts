@@ -1,6 +1,24 @@
 import {createHash} from "crypto";
 import {ITDOG_HASH_TOKEN} from "./data/const";
 
+// Type definitions for external dependencies
+interface CheerioAPI {
+    (selector: string): CheerioElement;
+}
+
+interface CheerioElement {
+    each(callback: (index: number, element: Element) => void | false): void;
+    html(): string | null;
+}
+
+interface BaseAPIInstance {
+    _makeHttpRequest(formData: Record<string, string>): Promise<Record<string, unknown>>;
+    createResult(taskId: string, taskToken: string, wssUrl: string, vars: Record<string, unknown>): unknown;
+    wsHandler: {
+        connect(config: { url: string; initialMessage: unknown }, onMessage?: (data: unknown) => void): Promise<void>;
+    };
+}
+
 export const md516 = (str: string): string => {
     const full = createHash("md5").update(str).digest("hex");
     return full.substring(8, 24);
@@ -37,19 +55,21 @@ export const parseScriptVariables = (scriptContent: string): Record<string, unkn
     return vars;
 };
 
-export const findTaskIdScript = ($: any): string | null => {
+export const findTaskIdScript = ($: CheerioAPI): string | null => {
     let scriptContent: string | null = null;
-    $('script').each((_index: number, element: any) => {
+    $('script').each((_index: number, element: Element) => {
         let content: string | null = null;
         try {
             content = $(element).html();
-        } catch (e) {
+        } catch {
             try {
-                if (element.children && Array.isArray(element.children)) {
-                    content = element.children.map((child: any) => child.data || '').join('');
+                if ('children' in element && Array.isArray(element.children)) {
+                    content = element.children.map((child: unknown) => 
+                        (child as { data?: string }).data || ''
+                    ).join('');
                 }
-            } catch (e2) {
-                console.warn('Failed to extract script content:', e2);
+            } catch {
+                // Silently ignore extraction errors
             }
         }
 
@@ -70,7 +90,8 @@ export const buildApiRequest = (
     if (useTargetInURL) {
         const target = formData['target'] || '';
         const url = `${baseURL}${endpoint}${target}`;
-        const {target: _, ...restFormData} = formData;
+        const {target, ...restFormData} = formData;
+        // target is used in URL construction above
         return {url, formData: restFormData};
     } else {
         const url = `${baseURL}${endpoint}`;
@@ -83,7 +104,7 @@ export const generateTaskToken = (taskId: string, hashToken?: string): string =>
 };
 
 export const executeAPIWithWebSocket = async (
-    api: any,
+    api: BaseAPIInstance,
     formData: Record<string, string>,
     onMessage?: (data: unknown) => void,
     hashToken?: string

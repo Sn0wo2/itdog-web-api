@@ -29,7 +29,7 @@ export class Client {
 
     async generic(
         endpoint: string,
-        params: Record<string, any> = {},
+        params: Record<string, unknown> = {},
         method: string = 'POST',
         onMessage?: (data: unknown) => void
     ) {

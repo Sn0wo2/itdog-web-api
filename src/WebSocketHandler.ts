@@ -7,7 +7,7 @@ export interface WebSocketConfig {
 }
 
 export class WebSocketHandler {
-    private websocket: any | null = null;
+    private websocket: WebSocket | null = null;
     private receivedData: unknown[] = [];
     async connect(config: WebSocketConfig, onMessage?: (data: unknown) => void): Promise<void> {
         return new Promise((resolve, reject) => {
@@ -23,12 +23,12 @@ export class WebSocketHandler {
                 }
             };
 
-            this.websocket.onmessage = (event: any) => {
-                let data: any;
+            this.websocket.onmessage = (event: MessageEvent) => {
+                let data: unknown;
                 try {
                     const message = event.data.toString();
                     data = JSON.parse(message);
-                } catch (e) {
+                } catch {
                     data = event.data;
                 }
                 this.receivedData.push(data);

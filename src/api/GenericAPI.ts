@@ -2,7 +2,7 @@ import {ClientOptions} from '../types.js';
 import {APIConfig, APIResult, BaseAPI} from './BaseAPI.js';
 
 export interface GenericAPIParams {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export interface GenericAPIConfig extends Partial<APIConfig> {
@@ -28,7 +28,8 @@ export class GenericAPI extends BaseAPI<GenericAPIParams> {
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
         const target = formData['target'] || '';
         const url = `${this.options.baseURL}${this.apiConfig.endpoint}${target}`;
-        const {target: _, ...restFormData} = formData;
+        const {target, ...restFormData} = formData;
+        // target is used in URL construction above
         return {
             url,
             formData: {
