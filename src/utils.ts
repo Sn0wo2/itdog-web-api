@@ -6,10 +6,12 @@ import type {APIResponse, WebSocketMessage} from './types.js';
 // cheerio types
 interface CheerioAPI {
     (selector: string): CheerioElement;
+
+    (element: unknown): CheerioElement;
 }
 
 interface CheerioElement {
-    each(callback: (index: number, element: CheerioNode) => void | false): void;
+    each(callback: (index: number, element: unknown) => void | false): void;
     html(): string | null;
 }
 
@@ -84,14 +86,15 @@ export const parseScriptVariables = (scriptContent: string): Record<string, unkn
 
 export const findTaskIdScript = ($: CheerioAPI): string | null => {
     let scriptContent: string | null = null;
-    $('script').each((_index: number, element: CheerioNode) => {
+    $('script').each((_index: number, element: unknown) => {
         let content: string | null = null;
         try {
-            content = $(element as CheerioNode).html();
+            content = $(element).html();
         } catch {
             try {
-                if (element.children && Array.isArray(element.children)) {
-                    content = element.children.map((child: CheerioNode) =>
+                const node = element as CheerioNode;
+                if (node.children && Array.isArray(node.children)) {
+                    content = node.children.map((child: CheerioNode) =>
                         child.data || ''
                     ).join('');
                 }
