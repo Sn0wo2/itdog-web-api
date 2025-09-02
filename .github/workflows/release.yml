@@ -23,8 +23,11 @@ jobs:
           node-version: 22
           registry-url: https://registry.npmjs.org
 
-      - name: Set version from tag
-        run: pnpm version ${GITHUB_REF_NAME#v} --no-git-tag-version
+      - name: Get version from git tag
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 | sed 's/^v//')
+          echo "Setting version to: $VERSION"
+          pnpm version $VERSION --no-git-tag-version
 
       - name: Build
         run: pnpm run build
