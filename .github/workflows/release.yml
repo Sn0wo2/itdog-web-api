@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: latest
+          run_install: true
+
+      - name: Set version from tag
+        run: pnpm version ${GITHUB_REF_NAME#v} --no-git-tag-version
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Publish to npm
+        run: pnpm publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
