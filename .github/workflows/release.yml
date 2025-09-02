@@ -3,7 +3,8 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
+  workflow_dispatch:
 
 jobs:
   release:
@@ -17,12 +18,16 @@ jobs:
           version: latest
           run_install: true
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
       - name: Set version from tag
         run: pnpm version ${GITHUB_REF_NAME#v} --no-git-tag-version
 
       - name: Build
         run: pnpm run build
-
 
       - name: Publish to npm
         run: pnpm publish --no-git-checks
