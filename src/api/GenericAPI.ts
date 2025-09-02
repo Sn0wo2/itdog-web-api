@@ -26,15 +26,13 @@ export class GenericAPI extends BaseAPI<GenericAPIParams> {
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
-        const target = formData['target'] || '';
-        const url = `${this.options.baseURL}${this.apiConfig.endpoint}${target}`;
-        const {target, ...restFormData} = formData;
-        // target is used in URL construction above
+        const targetValue = formData['target'] || '';
+        const url = `${this.options.baseURL}${this.apiConfig.endpoint}${targetValue}`;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const {target: _, ...restFormData} = formData;
         return {
             url,
-            formData: {
-                ...restFormData,
-            }
+            formData: restFormData,
         };
     }
 }

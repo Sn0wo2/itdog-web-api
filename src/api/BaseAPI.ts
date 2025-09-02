@@ -1,5 +1,5 @@
 import {Request} from '../Request.js';
-import {ClientOptions} from '../types.js';
+import type {APIResponse, ClientOptions} from '../types.js';
 import {executeAPIWithWebSocket} from '../utils.js';
 import {WebSocketHandler} from '../WebSocketHandler.js';
 
@@ -24,7 +24,7 @@ export interface APIResult {
 }
 
 export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
-    protected wsHandler: WebSocketHandler;
+    wsHandler: WebSocketHandler;
     protected options: ClientOptions;
     protected config: APIConfig;
 
@@ -36,8 +36,9 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
 
     abstract execute(params: T, onMessage?: (data: unknown) => void): Promise<R>;
 
-    async request(params: T): Promise<Record<string, unknown>> {
-        return this._makeHttpRequest(params as Record<string, string>);
+    async request(params: T): Promise<APIResponse> {
+        const response = await this._makeHttpRequest(params as Record<string, string>);
+        return response as APIResponse;
     }
 
     getWebSocketHandler(): WebSocketHandler {
@@ -48,7 +49,7 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
         this.wsHandler.close();
     }
 
-    protected async _makeHttpRequest(formData: Record<string, string>): Promise<Record<string, unknown>> {
+    async _makeHttpRequest(formData: Record<string, string>): Promise<APIResponse> {
         const {url, formData: processedFormData} = this.buildRequest(formData);
         return await Request.makeRequest({
             url,
@@ -57,7 +58,8 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
                 "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
                 "content-type": "application/x-www-form-urlencoded",
             },
-            body: new URLSearchParams(processedFormData).toString()
+            body: new URLSearchParams(processedFormData).toString(),
+            timeout: 30000,
         });
     }
 
@@ -66,11 +68,11 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
         formData: Record<string, string>
     };
 
-    protected createResult(
+    createResult(
         taskId: string,
         taskToken: string,
         wssUrl: string,
-        additionalData: Record<string, unknown> = {}
+        additionalData: APIResponse
     ): APIResult {
         return {
             taskId,

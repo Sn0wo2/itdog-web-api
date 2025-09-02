@@ -1,22 +1,49 @@
 import {createHash} from "crypto";
 import {ITDOG_HASH_TOKEN} from "./data/const";
 
-// Type definitions for external dependencies
+import type {APIResponse, WebSocketMessage} from './types.js';
+
+// cheerio types
 interface CheerioAPI {
     (selector: string): CheerioElement;
 }
 
 interface CheerioElement {
-    each(callback: (index: number, element: Element) => void | false): void;
+    each(callback: (index: number, element: CheerioNode) => void | false): void;
     html(): string | null;
 }
 
+interface CheerioNode {
+    children?: CheerioNode[];
+    data?: string;
+}
+
 interface BaseAPIInstance {
-    _makeHttpRequest(formData: Record<string, string>): Promise<Record<string, unknown>>;
-    createResult(taskId: string, taskToken: string, wssUrl: string, vars: Record<string, unknown>): unknown;
     wsHandler: {
-        connect(config: { url: string; initialMessage: unknown }, onMessage?: (data: unknown) => void): Promise<void>;
+        connect(config: {
+            url: string;
+            initialMessage: WebSocketMessage
+        }, onMessage?: (data: unknown) => void): Promise<void>;
     };
+
+    _makeHttpRequest(formData: Record<string, string>): Promise<APIResponse>;
+
+    createResult(taskId: string, taskToken: string, wssUrl: string, vars: APIResponse): APIResult;
+}
+
+interface APIResult {
+    taskId: string;
+    taskToken: string;
+    wssUrl: string;
+    messages: unknown[];
+
+    forEach(callback: (index: number, item: unknown) => void): void;
+
+    getMessage(index: number): unknown | undefined;
+
+    getMessageCount(): number;
+
+    [key: string]: unknown;
 }
 
 export const md516 = (str: string): string => {
@@ -57,19 +84,19 @@ export const parseScriptVariables = (scriptContent: string): Record<string, unkn
 
 export const findTaskIdScript = ($: CheerioAPI): string | null => {
     let scriptContent: string | null = null;
-    $('script').each((_index: number, element: Element) => {
+    $('script').each((_index: number, element: CheerioNode) => {
         let content: string | null = null;
         try {
-            content = $(element).html();
+            content = $(element as CheerioNode).html();
         } catch {
             try {
-                if ('children' in element && Array.isArray(element.children)) {
-                    content = element.children.map((child: unknown) => 
-                        (child as { data?: string }).data || ''
+                if (element.children && Array.isArray(element.children)) {
+                    content = element.children.map((child: CheerioNode) =>
+                        child.data || ''
                     ).join('');
                 }
             } catch {
-                // Silently ignore extraction errors
+                // ignore extraction errors
             }
         }
 
@@ -88,10 +115,10 @@ export const buildApiRequest = (
     useTargetInURL: boolean = true
 ): { url: string; formData: Record<string, string> } => {
     if (useTargetInURL) {
-        const target = formData['target'] || '';
-        const url = `${baseURL}${endpoint}${target}`;
-        const {target, ...restFormData} = formData;
-        // target is used in URL construction above
+        const targetValue = formData['target'] || '';
+        const url = `${baseURL}${endpoint}${targetValue}`;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const {target: _, ...restFormData} = formData;
         return {url, formData: restFormData};
     } else {
         const url = `${baseURL}${endpoint}`;
@@ -108,24 +135,21 @@ export const executeAPIWithWebSocket = async (
     formData: Record<string, string>,
     onMessage?: (data: unknown) => void,
     hashToken?: string
-) => {
-    const vars = await api._makeHttpRequest(formData);
-    const taskId = vars["task_id"] as string;
-    const wssUrl = vars["wss_url"] as string;
+): Promise<APIResult> => {
+    const response = await api._makeHttpRequest(formData);
 
-    if (!taskId || !wssUrl) {
-        throw new Error('Invalid response: missing task_id or wss_url');
+    if (!response.task_id || !response.wss_url) {
+        throw new Error('Invalid API response: missing task_id or wss_url');
     }
 
-    const taskToken = generateTaskToken(taskId, hashToken);
-
-    const result = api.createResult(taskId, taskToken, wssUrl, vars);
+    const taskToken = generateTaskToken(response.task_id, hashToken);
+    const result = api.createResult(response.task_id, taskToken, response.wss_url, response);
 
     await api.wsHandler.connect({
-        url: result.wssUrl,
+        url: response.wss_url,
         initialMessage: {
-            task_id: result.taskId,
-            task_token: result.taskToken,
+            task_id: response.task_id,
+            task_token: taskToken,
         }
     }, onMessage);
 
