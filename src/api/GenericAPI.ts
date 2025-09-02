@@ -1,78 +1,39 @@
-import {API_BASE_URL} from "../data/const";
-import { BaseAPI } from './BaseAPI';
-import { md5_16, parseScriptVariables, buildApiRequest, isNodeEnvironment, parseHtml, findTaskIdScript } from '../utils';
-import { ItdogOptions } from '../types';
-import { ApiEndpoint } from '../types';
+import {ClientOptions} from '../types.js';
+import {APIConfig, APIResult, BaseAPI} from './BaseAPI.js';
 
+export interface GenericAPIParams {
+    [key: string]: any;
+}
 
-export class GenericAPI extends BaseAPI<Record<string, any>> {
-    private apiConfig: ApiEndpoint;
+export interface GenericAPIConfig extends Partial<APIConfig> {
+    endpoint: string;
+    method?: string;
+}
 
-    constructor(options: ItdogOptions, apiConfig: ApiEndpoint) {
+export class GenericAPI extends BaseAPI<GenericAPIParams> {
+    private apiConfig: GenericAPIConfig;
+
+    constructor(options: ClientOptions, config: GenericAPIConfig) {
         super(options, {
-            baseURL: options.baseURL || 'https://www.itdog.cn',
-            endpoint: apiConfig.endpoint,
-            method: apiConfig.method || 'POST'
+            endpoint: config.endpoint,
+            method: config.method || 'POST'
         });
-        this.apiConfig = apiConfig;
+        this.apiConfig = config;
+    }
+
+    async execute(params: GenericAPIParams, onMessage?: (data: unknown) => void): Promise<APIResult> {
+        return this.executeWithWebSocket(params as Record<string, string>, onMessage);
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
-        return buildApiRequest(this.options.baseURL || API_BASE_URL, this.config.endpoint, formData, true);
-    }
-
-    async execute(params: Record<string, any>, onMessage?: (data: unknown) => void) {
-        this.clear();
-        
-        const formData = this.createFormData(params);
-        
-        const target = params.target || params.host || '';
-        if (!target) {
-            throw new Error("Target parameter is required");
-        }
-
-        formData['target'] = target;
-
-        const html = await this.makeRequest(formData);
-        const $ = parseHtml(html);
-        
-        const scriptContent = findTaskIdScript($);
-
-        if (!scriptContent) {
-            throw new Error("Cannot find script with task_id");
-        }
-
-        const vars = parseScriptVariables(scriptContent);
-        const task_token = md5_16((vars["task_id"] as string) + "token_20230313000136kwyktxb0tgspm00yo5");
-
-        const result = this.createResult(
-            vars["task_id"] as string,
-            task_token,
-            vars["wss_url"] as string,
-            vars
-        );
-
-        await this.wsHandler.connect({
-            url: result.wssUrl,
-            initialMessage: {
-                task_id: result.taskId,
-                task_token: result.taskToken,
+        const target = formData['target'] || '';
+        const url = `${this.options.baseURL}${this.apiConfig.endpoint}${target}`;
+        const {target: _, ...restFormData} = formData;
+        return {
+            url,
+            formData: {
+                ...restFormData,
             }
-        }, onMessage);
-
-        return result;
-    }
-
-    private createFormData(params: Record<string, any>): Record<string, string> {
-        const formData: Record<string, string> = { ...this.apiConfig.defaultParams };
-        
-        Object.entries(params).forEach(([key, value]) => {
-            const mappedKey = this.apiConfig.paramMap?.[key] || key;
-            if (value !== undefined && value !== null && mappedKey !== 'target') {
-                formData[mappedKey] = String(value);
-            }
-        });
-        
-        return formData;
+        };
     }
 }

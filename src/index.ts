@@ -1,2 +1,3 @@
-export { Itdog } from './Itdog';
-export { md5_16, parseScriptVariables } from './utils';
+export {Client} from './Client.js';
+export type {ClientOptions} from './types.js';
+export {GenericAPI, type GenericAPIConfig, type GenericAPIParams} from './api/GenericAPI.js';

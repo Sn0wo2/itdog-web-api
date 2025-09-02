@@ -1,8 +1,9 @@
-import { WebSocketHandler } from '../WebSocketHandler';
-import { ItdogOptions } from '../types';
+import {Request} from '../Request.js';
+import {ClientOptions} from '../types.js';
+import {executeAPIWithWebSocket} from '../utils.js';
+import {WebSocketHandler} from '../WebSocketHandler.js';
 
 export interface APIConfig {
-    baseURL: string;
     endpoint: string;
     method?: string;
 }
@@ -12,18 +13,22 @@ export interface APIResult {
     taskToken: string;
     wssUrl: string;
     messages: unknown[];
+
     forEach(callback: (index: number, item: unknown) => void): void;
+
     getMessage(index: number): unknown | undefined;
+
     getMessageCount(): number;
+
     [key: string]: unknown;
 }
 
 export abstract class BaseAPI<T = any, R = APIResult> {
     protected wsHandler: WebSocketHandler;
-    protected options: ItdogOptions;
+    protected options: ClientOptions;
     protected config: APIConfig;
 
-    protected constructor(options: ItdogOptions, config: APIConfig) {
+    protected constructor(options: ClientOptions, config: APIConfig) {
         this.options = options;
         this.config = config;
         this.wsHandler = new WebSocketHandler();
@@ -31,21 +36,36 @@ export abstract class BaseAPI<T = any, R = APIResult> {
 
     abstract execute(params: T, onMessage?: (data: unknown) => void): Promise<R>;
 
-    protected abstract buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> };
+    async request(params: T): Promise<Record<string, unknown>> {
+        return this._makeHttpRequest(params as Record<string, string>);
+    }
 
-    protected async makeRequest(formData: Record<string, string>): Promise<string> {
-        const { url, formData: processedFormData } = this.buildRequest(formData);
-        const response = await fetch(url, {
+    getWebSocketHandler(): WebSocketHandler {
+        return this.wsHandler;
+    }
+
+    close(): void {
+        this.wsHandler.close();
+    }
+
+    protected async _makeHttpRequest(formData: Record<string, string>): Promise<Record<string, unknown>> {
+        const {url, formData: processedFormData} = this.buildRequest(formData);
+        return await Request.makeRequest({
+            url,
+            method: this.config.method || "POST",
             headers: {
                 "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
                 "content-type": "application/x-www-form-urlencoded",
             },
-            body: new URLSearchParams(processedFormData).toString(),
-            method: this.config.method || "POST"
+            body: new URLSearchParams(processedFormData).toString()
         });
-
-        return response.text();
     }
+
+    protected abstract buildRequest(formData: Record<string, string>): {
+        url: string;
+        formData: Record<string, string>
+    };
+
     protected createResult(
         taskId: string,
         taskToken: string,
@@ -70,11 +90,10 @@ export abstract class BaseAPI<T = any, R = APIResult> {
         };
     }
 
-    close(): void {
-        this.wsHandler.close();
-    }
-
-    clear(): void {
-        this.wsHandler.clear();
+    protected async executeWithWebSocket(
+        formData: Record<string, string>,
+        onMessage?: (data: unknown) => void
+    ): Promise<APIResult> {
+        return executeAPIWithWebSocket(this, formData, onMessage, this.options.hashToken);
     }
 }

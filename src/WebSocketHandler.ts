@@ -1,13 +1,4 @@
-const isNode = typeof process !== 'undefined' && process.versions && process.versions.node;
-
-let WebSocket: any;
-if (isNode) {
-    WebSocket = require('ws');
-}
-
-export interface WebSocketMessage {
-    [key: string]: unknown;
-}
+import {WebSocket} from 'ws';
 
 export interface WebSocketConfig {
     url: string;
@@ -18,16 +9,13 @@ export interface WebSocketConfig {
 export class WebSocketHandler {
     private websocket: any | null = null;
     private receivedData: unknown[] = [];
-    private forEachCallback: ((item: unknown, index: number) => void) | null = null;
-
     async connect(config: WebSocketConfig, onMessage?: (data: unknown) => void): Promise<void> {
         return new Promise((resolve, reject) => {
             if (this.websocket) {
                 this.websocket.close();
             }
-            
-            // 根据环境选择WebSocket实现
-            this.websocket = isNode ? new WebSocket(config.url) : new (window as any).WebSocket(config.url);
+
+            this.websocket = new WebSocket(config.url);
 
             this.websocket.onopen = () => {
                 if (config.initialMessage) {
@@ -38,7 +26,7 @@ export class WebSocketHandler {
             this.websocket.onmessage = (event: any) => {
                 let data: any;
                 try {
-                    const message = isNode ? event.data.toString() : event.data;
+                    const message = event.data.toString();
                     data = JSON.parse(message);
                 } catch (e) {
                     data = event.data;
@@ -68,10 +56,6 @@ export class WebSocketHandler {
         });
     }
 
-    forEach(callback: (item: unknown, index: number) => void): void {
-        this.receivedData.forEach(callback);
-    }
-
     getMessages(): unknown[] {
         return [...this.receivedData];
     }
@@ -85,11 +69,5 @@ export class WebSocketHandler {
             this.websocket.close();
             this.websocket = null;
         }
-        this.forEachCallback = null;
-    }
-
-    clear(): void {
-        this.receivedData = [];
-        this.forEachCallback = null;
     }
 }
