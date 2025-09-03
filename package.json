@@ -1,22 +1,20 @@
 {
-  "name": "itdog-ping",
-  "version": "0.0.0",
+  "name": "itdog-web-api",
   "description": "A TypeScript library for ping functionality using itdog.cn Web API",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "clean": "rimraf dist",
-    "generate:index": "barrelsby -d src -o src/index.ts -e index.ts --delete",
-    "prebuild": "npm run clean && npm run generate:index",
-    "build": "rollup -c",
+    "build": "rimraf dist && barrelsby -d src -o src/index.ts -e index.ts --delete && rollup -c",
     "dev": "rollup -c -w",
     "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "example": "tsx example/test.ts"
+    "example": "tsx example/test.ts",
+    "prepublishOnly": "pnpm run lint && pnpm run test && pnpm run build"
   },
   "keywords": [
     "ping",
