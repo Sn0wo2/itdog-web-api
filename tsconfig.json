@@ -17,12 +17,12 @@
     "resolveJsonModule": true,
     "declarationDir": "dist"
   },
-  "include": [
-    "src",
-    "example"
-  ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "jest.config.ts",
+    "tsup.config.ts",
+    "commitlint.config.ts",
+    "eslint.config.js"
   ]
 }
