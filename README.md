@@ -42,6 +42,15 @@ const tcpingResult = await client.tcping('google.com', '80', (data) => {
 const batchResult = await client.batchTCPing(['google.com', 'github.com'], '443', (data) => {
     console.log('Batch TCPing data:', data);
 });
+
+// HTTP connectivity test
+const httpResult = await client.http('https://www.example.com', {
+    checkMode: 'fast',
+    method: 'get',
+    redirectNum: 5
+}, (data) => {
+    console.log('HTTP test data:', data);
+});
 ```
 
 ## 📖 API Reference
@@ -92,14 +101,27 @@ await client.tcping('example.com', '80', (data) => {
 - `port?: string` - The port to ping (optional)
 - `onMessage?: (data: unknown) => void` - Optional callback for real-time data
 
-##### batchTCPing(hosts, port?, onMessage?)
+##### batchTCPing(hosts, port?, onMessage?, options?)
 
-TCP ping multiple hosts simultaneously.
+TCP ping multiple hosts simultaneously with customizable testing nodes.
 
 ```typescript
+// Basic usage with default nodes
 await client.batchTCPing(['google.com', 'github.com'], '443', (data) => {
     console.log('Real-time batch data:', data);
 });
+
+// Advanced usage with custom nodes
+await client.batchTCPing(
+    ['google.com', 'github.com'],
+    '443',
+    (data) => console.log('Real-time data:', data),
+    {
+        nodeIds: ['1310', '1227', '1339'], // Beijing, Shanghai, Guangzhou
+        cidrFilter: true,
+        gateway: 'first'
+    }
+);
 ```
 
 **Parameters:**
@@ -107,6 +129,44 @@ await client.batchTCPing(['google.com', 'github.com'], '443', (data) => {
 - `hosts: string[]` - Array of target hosts to ping
 - `port?: string` - The port to ping (optional)
 - `onMessage?: (data: unknown) => void` - Optional callback for real-time data
+- `options?: object` - Optional configuration
+    - `nodeIds?: string | string[]` - Testing node IDs (see Node Selection below)
+    - `cidrFilter?: boolean` - Filter network/gateway/broadcast addresses in CIDR
+    - `gateway?: 'first' | 'last'` - Gateway address position
+
+##### http(host, options?, onMessage?)
+
+Test HTTP connectivity to a website.
+
+```typescript
+await client.http('https://example.com', {
+    checkMode: 'fast',
+    method: 'get',
+    redirectNum: 5,
+    dnsServerType: 'isp'
+}, (data) => {
+    console.log('Real-time HTTP test data:', data);
+});
+```
+
+**Parameters:**
+
+- `host: string` - The target URL to test
+- `options?: HttpOptions` - HTTP test configuration (optional)
+- `onMessage?: (data: unknown) => void` - Optional callback for real-time data
+
+**HttpOptions:**
+
+- `line?: string` - Test line selection
+- `checkMode?: 'fast' | 'normal'` - Test mode (default: 'fast')
+- `ipv4?: string` - Specific IPv4 address to use
+- `method?: 'get' | 'post' | 'head'` - HTTP method (default: 'get')
+- `referer?: string` - HTTP referer header
+- `userAgent?: string` - Custom user agent
+- `cookies?: string` - HTTP cookies
+- `redirectNum?: number` - Maximum redirects to follow (default: 5)
+- `dnsServerType?: 'isp' | 'custom'` - DNS server type (default: 'isp')
+- `dnsServer?: string` - Custom DNS server (when dnsServerType is 'custom')
 
 ##### generic(endpoint, params?, method?, onMessage?)
 
@@ -141,10 +201,41 @@ const customAPI = client.createAPI(config);
 const result = await customAPI.execute({target: 'example.com'});
 ```
 
+#### Node Selection (Stateless)
+
+Know available nodes before making calls:
+
+```typescript
+import {Client, DEFAULT_NODES, getNodesByCategory, getRandomNodes} from 'itdog-web-api';
+
+// View all available nodes (before any API call)
+console.log('Available nodes:', DEFAULT_NODES);
+console.log('Telecom nodes:', getNodesByCategory('中国电信'));
+console.log('Default random selection:', getRandomNodes()); // 4 nodes, one from each ISP
+
+const client = new Client();
+
+// Auto-select 4 random nodes (1 from each category)
+const result1 = await client.batchTCPing(['example.com'], '443');
+console.log('Used nodes:', result1.nodeIds);
+
+// Manual selection
+const result2 = await client.batchTCPing(['example.com'], '443', null, {
+    nodeIds: ['1310', '1254', '1246', '1213'] // Beijing Telecom, Shanghai Unicom, Henan Mobile, Tokyo
+});
+```
+
+**Categories:**
+
+- `中国电信` - China Telecom (4 nodes)
+- `中国联通` - China Unicom (4 nodes)
+- `中国移动` - China Mobile (4 nodes)
+- `港澳台、海外` - Overseas (4 nodes)
+
 #### Direct API Classes
 
 ```typescript
-import {PingAPI, TCPingAPI, BatchTCPingAPI} from 'itdog-web-api';
+import {PingAPI, TCPingAPI, BatchTCPingAPI, HttpAPI} from 'itdog-web-api';
 
 const pingAPI = new PingAPI({baseURL: 'https://custom-api.com'});
 const result = await pingAPI.execute({target: 'example.com'});
