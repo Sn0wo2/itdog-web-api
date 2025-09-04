@@ -1,4 +1,4 @@
-import {Client} from '../src';
+import {BatchTCPingParams, Client, HttpParams, PingParams, TCPingParams} from '../src';
 
 export interface TestConfig {
     name: string;
@@ -20,47 +20,53 @@ export class TestRunner {
     }
 
     async runSimpleTests(tests: TestConfig[]) {
-        console.log('Starting simple API tests...\n');
+        console.warn('Starting simple API tests...\n');
 
         for (let i = 0; i < tests.length; i++) {
             const test = tests[i];
             if (!test.enabled) continue;
 
-            console.log(`=== Testing ${test.name} ===`);
+            console.warn(`=== Testing ${test.name} ===`);
             try {
                 let result;
                 switch (test.name.toLowerCase()) {
                 case 'ping':
-                    result = await this.client.ping(test.params.target, this.defaultMessageHandler);
+                    result = await this.client.ping(test.params as PingParams, this.defaultMessageHandler);
                     break;
                 case 'tcping':
-                    result = await this.client.tcping(test.params.target, test.params.port, this.defaultMessageHandler);
+                    result = await this.client.tcping(
+                        test.params as TCPingParams, this.defaultMessageHandler);
                     break;
                 case 'batch tcping':
-                    result = await this.client.batchTCPing(test.params.hosts, test.params.port, this.defaultMessageHandler);
+                    result = await this.client.batchTCPing(test.params as BatchTCPingParams,
+                        this.defaultMessageHandler,
+                    );
+                    break;
+                case 'http':
+                    result = await this.client.http(test.params as HttpParams, this.defaultMessageHandler);
                     break;
                 default:
                     throw new Error(`Unknown test type: ${test.name}`);
                 }
-                console.log('Final result:', result);
+                console.warn('Final result:', result);
             } catch (error) {
                 console.error(`${test.name} test failed:`, error);
             }
 
             if (i < tests.length - 1) {
-                console.log('\n' + this.separator + '\n');
+                console.warn('\n' + this.separator + '\n');
             }
         }
     }
 
     async runGenericAPITests(tests: APITestConfig[]) {
-        console.log('Starting Generic API tests...\n');
+        console.warn('Starting Generic API tests...\n');
 
         for (let i = 0; i < tests.length; i++) {
             const test = tests[i];
             if (!test.enabled) continue;
 
-            console.log(`=== Testing ${test.name} ===`);
+            console.warn(`=== Testing ${test.name} ===`);
             try {
                 const api = this.client.createAPI({
                     endpoint: test.endpoint,
@@ -68,37 +74,60 @@ export class TestRunner {
                 });
 
                 const result = await api.execute(test.params, this.defaultMessageHandler);
-                console.log('Final result:', result);
+                console.warn('Final result:', result);
             } catch (error) {
                 console.error(`${test.name} test failed:`, error);
             }
 
             if (i < tests.length - 1) {
-                console.log('\n' + this.separator + '\n');
+                console.warn('\n' + this.separator + '\n');
             }
         }
     }
 
     private defaultMessageHandler = (data: any) => {
-        console.log('Real-time data:', data);
+        console.debug('Real-time data:', data);
     };
 }
 
 export const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     {
         name: 'Ping',
-        enabled: false,
+        enabled: true,
         params: {target: 'baidu.com'}
     },
     {
         name: 'TCPing',
-        enabled: false,
-        params: {target: 'baidu.com', port: '80'}
+        enabled: true,
+        params: {target: 'openrouter.ai', port: '443'}
     },
     {
         name: 'Batch TCPing',
-        enabled: false,
-        params: {hosts: 'baidu.com,google.com', port: '80'}
+        enabled: true,
+        params: {
+            hosts: ['www.baidu.com', 'www.google.com'],
+            port: '443',
+            cidrFilter: true,
+            gateway: 'first'
+        }
+    },
+    {
+        name: 'HTTP',
+        enabled: true,
+        params: {
+            line: '',
+            host: 'https://www.baidu.com',
+            host_s: 'www.baidu.com',
+            check_mode: 'fast',
+            ipv4: '',
+            method: 'get',
+            referer: '',
+            ua: '',
+            cookies: '',
+            redirect_num: '5',
+            dns_server_type: 'isp',
+            dns_server: ''
+        }
     }
 ];
 
@@ -124,6 +153,25 @@ export const DEFAULT_GENERIC_API_TESTS: APITestConfig[] = [
             target: 'openrouter.ai:443',
             line: '1,3,5',
             button_click: 'yes'
+        }
+    },
+    {
+        name: 'Generic API (HTTP)',
+        enabled: false,
+        endpoint: '/http/',
+        params: {
+            line: '',
+            host: 'https://www.baidu.com',
+            host_s: 'www.baidu.com',
+            check_mode: 'fast',
+            ipv4: '',
+            method: 'get',
+            referer: '',
+            ua: '',
+            cookies: '',
+            redirect_num: '5',
+            dns_server_type: 'isp',
+            dns_server: ''
         }
     }
 ];
