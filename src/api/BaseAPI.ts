@@ -1,27 +1,8 @@
 import {Request} from '../Request.js';
-import type {APIResponse, ClientOptions} from '../types.js';
+import type {APIConfig, APIResponse, APIResult, ClientOptions} from '../types.js';
 import {executeAPIWithWebSocket} from '../utils.js';
 import {WebSocketHandler} from '../WebSocketHandler.js';
 
-export interface APIConfig {
-    endpoint: string;
-    method?: string;
-}
-
-export interface APIResult {
-    taskId: string;
-    taskToken: string;
-    wssUrl: string;
-    messages: unknown[];
-
-    forEach(callback: (index: number, item: unknown) => void): void;
-
-    getMessage(index: number): unknown | undefined;
-
-    getMessageCount(): number;
-
-    [key: string]: unknown;
-}
 
 export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
     wsHandler: WebSocketHandler;
@@ -63,11 +44,6 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
         });
     }
 
-    protected abstract buildRequest(formData: Record<string, string>): {
-        url: string;
-        formData: Record<string, string>
-    };
-
     createResult(
         taskId: string,
         taskToken: string,
@@ -91,6 +67,11 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
             ...additionalData
         };
     }
+
+    protected abstract buildRequest(formData: Record<string, string>): {
+        url: string;
+        formData: Record<string, string>
+    };
 
     protected async executeWithWebSocket(
         formData: Record<string, string>,

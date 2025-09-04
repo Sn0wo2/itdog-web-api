@@ -1,14 +1,6 @@
-import {ClientOptions} from '../types.js';
-import {APIConfig, APIResult, BaseAPI} from './BaseAPI.js';
+import {APIResult, ClientOptions, GenericAPIConfig, GenericAPIParams} from '../types.js';
+import {BaseAPI} from './BaseAPI.js';
 
-export interface GenericAPIParams {
-    [key: string]: unknown;
-}
-
-export interface GenericAPIConfig extends Partial<APIConfig> {
-    endpoint: string;
-    method?: string;
-}
 
 export class GenericAPI extends BaseAPI<GenericAPIParams> {
     private apiConfig: GenericAPIConfig;

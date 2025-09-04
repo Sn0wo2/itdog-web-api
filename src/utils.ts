@@ -1,52 +1,8 @@
 import {createHash} from "crypto";
 import {ITDOG_HASH_TOKEN} from "./data/const";
+import type {CheerioNode} from "./types";
 
-import type {APIResponse, WebSocketMessage} from './types.js';
-
-// cheerio types
-interface CheerioAPI {
-    (selector: string): CheerioElement;
-
-    (element: unknown): CheerioElement;
-}
-
-interface CheerioElement {
-    each(callback: (index: number, element: unknown) => void | false): void;
-    html(): string | null;
-}
-
-interface CheerioNode {
-    children?: CheerioNode[];
-    data?: string;
-}
-
-interface BaseAPIInstance {
-    wsHandler: {
-        connect(config: {
-            url: string;
-            initialMessage: WebSocketMessage
-        }, onMessage?: (data: unknown) => void): Promise<void>;
-    };
-
-    _makeHttpRequest(formData: Record<string, string>): Promise<APIResponse>;
-
-    createResult(taskId: string, taskToken: string, wssUrl: string, vars: APIResponse): APIResult;
-}
-
-interface APIResult {
-    taskId: string;
-    taskToken: string;
-    wssUrl: string;
-    messages: unknown[];
-
-    forEach(callback: (index: number, item: unknown) => void): void;
-
-    getMessage(index: number): unknown | undefined;
-
-    getMessageCount(): number;
-
-    [key: string]: unknown;
-}
+import type {APIResult, BaseAPIInstance, CheerioAPI} from './types.js';
 
 export const md516 = (str: string): string => {
     const full = createHash("md5").update(str).digest("hex");
@@ -120,8 +76,8 @@ export const buildApiRequest = (
     if (useTargetInURL) {
         const targetValue = formData['target'] || '';
         const url = `${baseURL}${endpoint}${targetValue}`;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const {target: _, ...restFormData} = formData;
+        const restFormData = {...formData};
+        delete restFormData['target'];
         return {url, formData: restFormData};
     } else {
         const url = `${baseURL}${endpoint}`;

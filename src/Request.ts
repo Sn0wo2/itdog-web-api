@@ -1,14 +1,7 @@
 import {load} from 'cheerio';
-import type {APIResponse} from './types.js';
+import type {APIResponse, RequestConfig} from './types.js';
 import {findTaskIdScript, parseScriptVariables} from './utils.js';
 
-export interface RequestConfig {
-    url: string;
-    method?: string;
-    headers?: Record<string, string>;
-    body?: string | URLSearchParams;
-    timeout?: number;
-}
 
 export class Request {
     static async makeRequest(config: RequestConfig): Promise<APIResponse> {
@@ -31,20 +24,8 @@ export class Request {
             }
 
             const html = await response.text();
-            const $ = load(html);
-            const scriptContent = findTaskIdScript($);
 
-            if (!scriptContent) {
-                throw new Error('Cannot find script with task_id in response');
-            }
-
-            const variables = parseScriptVariables(scriptContent);
-
-            if (!variables.task_id || !variables.wss_url) {
-                throw new Error('Invalid response: missing required fields (task_id, wss_url)');
-            }
-
-            return variables as APIResponse;
+            return this.parseResponse(html);
         } catch (error) {
             if (error instanceof Error && error.name === 'AbortError') {
                 throw new Error(`Request timeout after ${config.timeout}ms`);
@@ -55,5 +36,22 @@ export class Request {
                 clearTimeout(timeoutId);
             }
         }
+    }
+
+    static parseResponse(html: string): APIResponse {
+        const $ = load(html);
+        const scriptContent = findTaskIdScript($);
+
+        if (!scriptContent) {
+            throw new Error('Cannot find script with task_id in response');
+        }
+
+        const variables = parseScriptVariables(scriptContent);
+
+        if (!variables.task_id || !variables.wss_url) {
+            throw new Error('Invalid response: missing required fields (task_id, wss_url)');
+        }
+
+        return variables as APIResponse;
     }
 }

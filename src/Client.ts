@@ -1,9 +1,10 @@
 import {BatchTCPingAPI} from "./api/endpoint/BatchTCPingAPI.js";
+import {HttpAPI} from "./api/endpoint/HttpAPI.js";
 import {PingAPI} from "./api/endpoint/PingAPI.js";
 import {TCPingAPI} from "./api/endpoint/TCPingAPI.js";
-import {GenericAPI, GenericAPIConfig} from "./api/GenericAPI.js";
+import {GenericAPI} from "./api/GenericAPI.js";
 import {API_BASE_URL} from "./data/const.js";
-import {ClientOptions} from './types.js';
+import {BatchTCPingParams, ClientOptions, GenericAPIConfig, HttpParams, PingParams, TCPingParams} from './types.js';
 
 export class Client {
     private readonly options: ClientOptions;
@@ -15,16 +16,23 @@ export class Client {
         };
     }
 
-    async ping(target: string, onMessage?: (data: unknown) => void) {
-        return new PingAPI(this.options).execute({target}, onMessage);
+    async ping(options: PingParams, onMessage?: (data: unknown) => void) {
+        return new PingAPI(this.options).execute(options, onMessage);
     }
 
-    async tcping(target: string, port?: string, onMessage?: (data: unknown) => void) {
-        return new TCPingAPI(this.options).execute({target, port}, onMessage);
+    async tcping(options: TCPingParams, onMessage?: (data: unknown) => void) {
+        return new TCPingAPI(this.options).execute(options, onMessage);
     }
 
-    async batchTCPing(hosts: string[], port?: string, onMessage?: (data: unknown) => void) {
-        return new BatchTCPingAPI(this.options).execute({hosts, port}, onMessage);
+    async batchTCPing(
+        options: BatchTCPingParams,
+        onMessage?: (data: unknown) => void
+    ) {
+        return new BatchTCPingAPI(this.options).execute(options, onMessage);
+    }
+
+    async http(options: HttpParams, onMessage?: (data: unknown) => void) {
+        return new HttpAPI(this.options).execute(options, onMessage);
     }
 
     async generic(

@@ -1,14 +1,8 @@
+import {PingParams} from "../../types";
 import {ClientOptions} from '../../types.js';
 import {buildApiRequest} from '../../utils.js';
 import {BaseAPI} from '../BaseAPI.js';
 
-
-export interface PingParams {
-    target: string;
-    line?: string;
-    dnsServerType?: "isp" | "custom";
-    dnsServer?: string;
-}
 
 export class PingAPI extends BaseAPI<PingParams> {
     constructor(options: ClientOptions) {

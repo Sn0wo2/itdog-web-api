@@ -1,11 +1,6 @@
 import {WebSocket} from 'ws';
-import type {WebSocketMessage} from './types.js';
+import type {WebSocketConfig} from './types.js';
 
-export interface WebSocketConfig {
-    url: string;
-    initialMessage?: WebSocketMessage;
-    timeout?: number;
-}
 
 export class WebSocketHandler {
     private websocket: WebSocket | null = null;
