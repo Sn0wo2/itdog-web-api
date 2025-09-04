@@ -22,7 +22,6 @@ const config: UserConfig = {
             ],
         ],
         'subject-full-stop': [2, 'never', '.'],
-        'subject-case': [2, 'always', 'lower-case'],
     },
 }
 
