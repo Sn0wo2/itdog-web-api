@@ -32,3 +32,24 @@ jobs:
 
       - name: Build
         run: pnpm run build
+
+      - name: Check for file changes
+        id: git-check
+        run: |
+          if git diff --exit-code; then
+          echo "changed=false" >> $GITHUB_OUTPUT
+          else
+          echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request with lint fixes
+        if: steps.git-check.outputs.changed == 'true' && github.ref == 'refs/heads/main'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore(lint): fix issues"
+          title: "chore(lint): fix issues"
+          body: "The `eslint fix` action wants to apply these fixes."
+          branch: "chore/eslint-fixes"
+          base: main
+          signoff: true
+          sign-commits: true
