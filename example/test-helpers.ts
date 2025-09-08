@@ -1,4 +1,4 @@
-import {BatchTCPingParams, Client, HttpParams, PingParams, TCPingParams} from '../src';
+import {BatchTCPingParams, Client, HttpParams, PingParams, TCPingParams, TraceRouteParams} from '../src';
 
 export interface TestConfig {
     name: string;
@@ -44,6 +44,9 @@ export class TestRunner {
                     break;
                 case 'http':
                     result = await this.client.http(test.params as HttpParams, this.defaultMessageHandler);
+                    break;
+                case 'trace route':
+                    result = await this.client.traceRoute(test.params as TraceRouteParams, this.defaultMessageHandler);
                     break;
                 default:
                     throw new Error(`Unknown test type: ${test.name}`);
@@ -93,17 +96,17 @@ export class TestRunner {
 export const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     {
         name: 'Ping',
-        enabled: true,
+        enabled: false,
         params: {target: 'baidu.com'}
     },
     {
         name: 'TCPing',
-        enabled: true,
+        enabled: false,
         params: {target: 'openrouter.ai', port: '443'}
     },
     {
         name: 'Batch TCPing',
-        enabled: true,
+        enabled: false,
         params: {
             hosts: ['www.baidu.com', 'www.google.com'],
             port: '443',
@@ -113,7 +116,7 @@ export const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     },
     {
         name: 'HTTP',
-        enabled: true,
+        enabled: false,
         params: {
             line: '',
             host: 'https://www.baidu.com',
@@ -128,13 +131,22 @@ export const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
             dns_server_type: 'isp',
             dns_server: ''
         }
+    },
+    {
+        name: 'Trace Route',
+        enabled: true,
+        params: {
+            host: 'www.baidu.com',
+            dns_server_type: 'isp',
+            dns_server: ''
+        }
     }
 ];
 
 export const DEFAULT_GENERIC_API_TESTS: APITestConfig[] = [
     {
         name: 'Generic API (Ping)',
-        enabled: true,
+        enabled: false,
         endpoint: '/ping/',
         params: {
             target: 'baidu.com',
@@ -146,7 +158,7 @@ export const DEFAULT_GENERIC_API_TESTS: APITestConfig[] = [
     },
     {
         name: 'Custom API (TCPing)',
-        enabled: true,
+        enabled: false,
         endpoint: '/tcping/',
         method: 'POST',
         params: {

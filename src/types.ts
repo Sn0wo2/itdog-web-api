@@ -100,6 +100,13 @@ export interface HttpParams {
     dnsServer?: string;
 }
 
+export interface TraceRouteParams {
+    host: string;
+    node?: string;
+    dnsServerType?: 'isp' | 'custom';
+    dnsServer?: string;
+}
+
 export interface GenericAPIParams {
     [key: string]: unknown;
 }
