@@ -1,6 +1,6 @@
 import {getRandomNodes} from "../../data/nodes";
 import {ClientOptions, TraceRouteParams} from '../../types.js';
-import {buildApiRequest} from '../../utils.js';
+import {_buildAPIRequest} from '../../utils.js';
 import {BaseAPI} from '../BaseAPI.js';
 
 export class TraceRouteAPI extends BaseAPI<TraceRouteParams> {
@@ -24,6 +24,6 @@ export class TraceRouteAPI extends BaseAPI<TraceRouteParams> {
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
-        return buildApiRequest(this.options.baseURL as string, this.config.endpoint, formData, true);
+        return _buildAPIRequest(this.options.baseURL as string, this.config.endpoint, formData, true);
     }
 }

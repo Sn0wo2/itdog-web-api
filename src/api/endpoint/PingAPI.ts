@@ -1,6 +1,6 @@
 import {PingParams} from "../../types";
 import {ClientOptions} from '../../types.js';
-import {buildApiRequest} from '../../utils.js';
+import {_buildAPIRequest} from '../../utils.js';
 import {BaseAPI} from '../BaseAPI.js';
 
 
@@ -24,6 +24,6 @@ export class PingAPI extends BaseAPI<PingParams> {
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
-        return buildApiRequest(this.options.baseURL as string, this.config.endpoint, formData, true);
+        return _buildAPIRequest(this.options.baseURL as string, this.config.endpoint, formData, true);
     }
 }

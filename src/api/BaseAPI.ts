@@ -1,6 +1,7 @@
+import {ITDOG_HASH_TOKEN} from "../data/const";
 import {Request} from '../Request.js';
 import type {APIConfig, APIResponse, APIResult, ClientOptions} from '../types.js';
-import {executeAPIWithWebSocket} from '../utils.js';
+import {_md5_16} from '../utils.js';
 import {WebSocketHandler} from '../WebSocketHandler.js';
 
 
@@ -77,6 +78,23 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
         formData: Record<string, string>,
         onMessage?: (data: unknown) => void
     ): Promise<APIResult> {
-        return executeAPIWithWebSocket(this, formData, onMessage, this.options.hashToken);
+        const response = await this._makeHttpRequest(formData);
+
+        if (!response.task_id || !response.wss_url) {
+            throw new Error('Invalid API response: missing task_id or wss_url');
+        }
+
+        const taskToken = _md5_16(response.task_id + (this.options.hashToken || ITDOG_HASH_TOKEN));
+        const result = this.createResult(response.task_id, taskToken, response.wss_url, response);
+
+        await this.wsHandler.connect({
+            url: response.wss_url,
+            initialMessage: {
+                task_id: response.task_id,
+                task_token: taskToken,
+            }
+        }, onMessage);
+
+        return result;
     }
 }

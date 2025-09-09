@@ -19,6 +19,7 @@ export interface WebSocketConfig {
 export interface APIResponse {
     task_id: string;
     wss_url: string;
+    rawResponse?: Response;
 
     [key: string]: unknown;
 }
@@ -128,7 +129,7 @@ export interface CheerioNode {
     data?: string;
 }
 
-export interface BaseAPIInstance {
+export interface _BaseAPIInstance {
     wsHandler: {
         connect(config: {
             url: string;

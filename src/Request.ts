@@ -1,6 +1,6 @@
 import {load} from 'cheerio';
 import type {APIResponse, RequestConfig} from './types.js';
-import {findTaskIdScript, parseScriptVariables} from './utils.js';
+import {_findTaskIdScript, _parseScriptVariables} from './utils.js';
 
 
 export class Request {
@@ -24,8 +24,12 @@ export class Request {
             }
 
             const html = await response.text();
+            const parsedResponse = this.parseResponse(html);
 
-            return this.parseResponse(html);
+            return {
+                ...parsedResponse,
+                rawResponse: response
+            };
         } catch (error) {
             if (error instanceof Error && error.name === 'AbortError') {
                 throw new Error(`Request timeout after ${config.timeout}ms`);
@@ -39,14 +43,13 @@ export class Request {
     }
 
     static parseResponse(html: string): APIResponse {
-        const $ = load(html);
-        const scriptContent = findTaskIdScript($);
+        const scriptContent = _findTaskIdScript(load(html));
 
         if (!scriptContent) {
             throw new Error('Cannot find script with task_id in response');
         }
 
-        const variables = parseScriptVariables(scriptContent);
+        const variables = _parseScriptVariables(scriptContent);
 
         if (!variables.task_id || !variables.wss_url) {
             throw new Error('Invalid response: missing required fields (task_id, wss_url)');

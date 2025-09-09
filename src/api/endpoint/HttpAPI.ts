@@ -1,5 +1,5 @@
 import {ClientOptions, HttpParams} from '../../types.js';
-import {buildApiRequest} from '../../utils.js';
+import {_buildAPIRequest} from '../../utils.js';
 import {BaseAPI} from '../BaseAPI.js';
 
 export class HttpAPI extends BaseAPI<HttpParams> {
@@ -29,7 +29,7 @@ export class HttpAPI extends BaseAPI<HttpParams> {
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
-        return buildApiRequest(this.options.baseURL as string, this.config.endpoint, formData, true);
+        return _buildAPIRequest(this.options.baseURL as string, this.config.endpoint, formData, true);
     }
 
     private extractHostname(url: string): string {

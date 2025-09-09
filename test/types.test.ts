@@ -1,4 +1,4 @@
-import type {APIResponse, ClientOptions, WebSocketMessage} from '../src/types';
+import type {APIResponse, ClientOptions, WebSocketMessage} from '../src';
 
 describe('Types', () => {
     describe('ClientOptions', () => {
