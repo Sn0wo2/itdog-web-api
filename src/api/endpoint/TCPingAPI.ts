@@ -13,11 +13,11 @@ export class TCPingAPI extends BaseAPI<TCPingParams> {
 
     async execute(params: TCPingParams, onMessage?: (data: unknown) => void) {
         const formData: Record<string, string> = {
-            target: params.port ? `${params.target}:${params.port}` : params.target,
+            target: params.target,
             line: params.line || '',
             button_click: 'yes',
-            dns_server_type: 'isp',
-            dns_server: ''
+            dns_server_type: params.dnsServerType || 'isp',
+            dns_server: params.dnsServerType === 'custom' && params.dnsServer ? params.dnsServer : ''
         };
 
         return this.executeWithWebSocket(formData, onMessage);

@@ -74,9 +74,9 @@ export interface PingParams {
 
 export interface TCPingParams {
     target: string;
-    port?: string;
     line?: string;
-    timeout?: string;
+    dnsServerType?: 'isp' | 'custom',
+    dnsServer?: string,
 }
 
 export interface BatchTCPingParams {
@@ -90,7 +90,7 @@ export interface BatchTCPingParams {
 export interface HttpParams {
     host: string;
     line?: string;
-    checkMode?: 'fast' | 'normal';
+    checkMode?: 'fast' | 'slow  ';
     ipv4?: string;
     method?: 'get' | 'post';
     referer?: string;
@@ -127,17 +127,4 @@ export interface CheerioElement {
 export interface CheerioNode {
     children?: CheerioNode[];
     data?: string;
-}
-
-export interface _BaseAPIInstance {
-    wsHandler: {
-        connect(config: {
-            url: string;
-            initialMessage: WebSocketMessage
-        }, onMessage?: (data: unknown) => void): Promise<void>;
-    };
-
-    _makeHttpRequest(formData: Record<string, string>): Promise<APIResponse>;
-
-    createResult(taskId: string, taskToken: string, wssUrl: string, vars: APIResponse): APIResult;
 }

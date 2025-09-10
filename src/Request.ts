@@ -26,9 +26,14 @@ export class Request {
             const html = await response.text();
             const parsedResponse = this.parseResponse(html);
 
+            const customResponse = {
+                ...response,
+                text: async () => html
+            };
+
             return {
                 ...parsedResponse,
-                rawResponse: response
+                rawResponse: customResponse
             };
         } catch (error) {
             if (error instanceof Error && error.name === 'AbortError') {

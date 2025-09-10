@@ -13,7 +13,7 @@ export class HttpAPI extends BaseAPI<HttpParams> {
         const formData: Record<string, string> = {
             line: params.line || '',
             host: params.host,
-            host_s: this.extractHostname(params.host),
+            host_s: params.host,
             check_mode: params.checkMode || 'fast',
             ipv4: params.ipv4 || '',
             method: params.method || 'get',
@@ -30,15 +30,5 @@ export class HttpAPI extends BaseAPI<HttpParams> {
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
         return _buildAPIRequest(this.options.baseURL as string, this.config.endpoint, formData, true);
-    }
-
-    private extractHostname(url: string): string {
-        try {
-            const urlObj = new URL(url);
-            return urlObj.hostname;
-        } catch {
-            const match = url.match(/^(?:https?:\/\/)?([^/]+)/);
-            return match ? match[1] : url;
-        }
     }
 }

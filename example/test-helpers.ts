@@ -96,17 +96,17 @@ export class TestRunner {
 export const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     {
         name: 'Ping',
-        enabled: false,
+        enabled: true,
         params: {target: 'baidu.com'}
     },
     {
         name: 'TCPing',
-        enabled: false,
+        enabled: true,
         params: {target: 'openrouter.ai', port: '443'}
     },
     {
         name: 'Batch TCPing',
-        enabled: false,
+        enabled: true,
         params: {
             hosts: ['www.baidu.com', 'www.google.com'],
             port: '443',
@@ -116,7 +116,7 @@ export const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     },
     {
         name: 'HTTP',
-        enabled: false,
+        enabled: true,
         params: {
             line: '',
             host: 'https://www.baidu.com',
@@ -146,7 +146,7 @@ export const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
 export const DEFAULT_GENERIC_API_TESTS: APITestConfig[] = [
     {
         name: 'Generic API (Ping)',
-        enabled: false,
+        enabled: true,
         endpoint: '/ping/',
         params: {
             target: 'baidu.com',
@@ -158,7 +158,7 @@ export const DEFAULT_GENERIC_API_TESTS: APITestConfig[] = [
     },
     {
         name: 'Custom API (TCPing)',
-        enabled: false,
+        enabled: true,
         endpoint: '/tcping/',
         method: 'POST',
         params: {
@@ -169,7 +169,7 @@ export const DEFAULT_GENERIC_API_TESTS: APITestConfig[] = [
     },
     {
         name: 'Generic API (HTTP)',
-        enabled: false,
+        enabled: true,
         endpoint: '/http/',
         params: {
             line: '',

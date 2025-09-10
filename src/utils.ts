@@ -75,8 +75,8 @@ export const _buildAPIRequest = (
     useTargetInURL: boolean = true
 ): { url: string; formData: Record<string, string> } => {
     if (useTargetInURL) {
-        const targetValue = formData['target'] || '';
-        const url = `${baseURL}${endpoint}${targetValue}`;
+        const url = `${baseURL}${endpoint}${extractHostname(formData['target']) || ''}`;
+
         const restFormData = {...formData};
         delete restFormData['target'];
         return {url, formData: restFormData};
@@ -85,3 +85,15 @@ export const _buildAPIRequest = (
         return {url, formData};
     }
 };
+
+const extractHostname = (url: string): string => {
+    if (!url) {
+        return ""
+    }
+    try {
+        return new URL(url).hostname;
+    } catch {
+        const match = url.match(/^(?:https?:\/\/)?([^/]+)/);
+        return match ? match[1] : url;
+    }
+}
