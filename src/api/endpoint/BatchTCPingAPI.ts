@@ -37,8 +37,7 @@ export class BatchTCPingAPI extends BaseAPI<BatchTCPingParams> {
         const response = await super._makeHttpRequest(formData);
 
         if (response.rawResponse) {
-            const html = await response.rawResponse.text();
-            updateNodesFromHtml(html);
+            updateNodesFromHtml(await response.rawResponse.text());
         }
 
         return response;

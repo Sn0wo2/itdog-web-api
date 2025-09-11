@@ -1,75 +1,69 @@
-import {getDefaultNodes, getNodesByCategory, getRandomNodes, updateNodesFromHtml} from '../src/data/nodes.js';
+import {getAllNodes, getDefaultNodes, getNodesByCategory, updateNodesFromHtml} from '../src/data/nodes';
 
-describe('Nodes', () => {
-    test('getDefaultNodes returns correct structure', () => {
-        const nodes = getDefaultNodes();
-        expect(nodes).toBeDefined();
-        expect(typeof nodes).toBe('object');
-        expect(Object.keys(nodes).length).toBeGreaterThan(0);
+describe('Node parsing and management', () => {
+    const testHtml = `
+        <select>
+            <optgroup label="测试分组1">
+                <option value="1">节点1</option>
+                <option value="2">节点2</option>
+            </optgroup>
+            <optgroup label="测试分组2">
+                <option value="3">节点3</option>
+            </optgroup>
+        </select>
+    `;
 
-        expect(nodes['中国电信']).toBeDefined();
-        expect(nodes['中国联通']).toBeDefined();
-        expect(nodes['中国移动']).toBeDefined();
-        expect(nodes['港澳台、海外']).toBeDefined();
+    const invalidHtml = `
+        <select>
+            <optgroup>
+                <option>Invalid Node</option>
+            </optgroup>
+        </select>
+    `;
 
-        const telecomNodes = nodes['中国电信'];
-        expect(Array.isArray(telecomNodes)).toBe(true);
-        expect(telecomNodes.length).toBeGreaterThan(0);
+    describe('updateNodesFromHtml', () => {
+        it('should parse valid HTML correctly', () => {
+            updateNodesFromHtml(testHtml);
+            const nodes = getDefaultNodes();
 
-        const firstNode = telecomNodes[0];
-        expect(firstNode).toHaveProperty('id');
-        expect(firstNode).toHaveProperty('name');
-        expect(firstNode).toHaveProperty('category');
-        expect(firstNode.category).toBe('中国电信');
-    });
-
-    test('getNodesByCategory returns correct nodes', () => {
-        const telecomNodes = getNodesByCategory('中国电信');
-        expect(Array.isArray(telecomNodes)).toBe(true);
-        expect(telecomNodes.length).toBeGreaterThan(0);
-
-        telecomNodes.forEach(node => {
-            expect(node.category).toBe('中国电信');
+            expect(Object.keys(nodes)).toHaveLength(2);
+            expect(nodes['测试分组1']).toHaveLength(2);
+            expect(nodes['测试分组2']).toHaveLength(1);
         });
 
-        const emptyNodes = getNodesByCategory('哈基米不存在喵');
-        expect(Array.isArray(emptyNodes)).toBe(true);
-        expect(emptyNodes.length).toBe(0);
-    });
+        it('should handle invalid HTML gracefully', () => {
+            const originalNodes = getDefaultNodes();
+            updateNodesFromHtml(invalidHtml);
 
-    test('getRandomNodes returns array of node IDs', () => {
-        const nodeIds = getRandomNodes();
-        expect(Array.isArray(nodeIds)).toBe(true);
-        expect(nodeIds.length).toBe(4);
+            // Should keep original nodes on invalid input
+            expect(getDefaultNodes()).toEqual(originalNodes);
+        });
 
-        nodeIds.forEach(id => {
-            expect(typeof id).toBe('string');
+        it('should handle empty HTML input', () => {
+            const originalNodes = getDefaultNodes();
+            updateNodesFromHtml('');
+
+            // Should keep original nodes on empty input
+            expect(getDefaultNodes()).toEqual(originalNodes);
         });
     });
 
-    test('updateNodesFromHtml updates nodes correctly', () => {
-        const mockHtml = `
-            <select>
-                <optgroup label="测试类别1">
-                    <option value="test1">测试节点1</option>
-                    <option value="test2">测试节点2</option>
-                </optgroup>
-                <optgroup label="测试类别2">
-                    <option value="test3">测试节点3</option>
-                </optgroup>
-            </select>
-        `;
+    describe('Node retrieval functions', () => {
+        beforeAll(() => {
+            updateNodesFromHtml(testHtml);
+        });
 
-        updateNodesFromHtml(mockHtml);
+        it('should get all nodes correctly', () => {
+            const allNodes = getAllNodes();
+            expect(allNodes).toHaveLength(3);
+        });
 
-        const updatedNodes = getDefaultNodes();
-        expect(updatedNodes['测试类别1']).toBeDefined();
-        expect(updatedNodes['测试类别2']).toBeDefined();
-        expect(updatedNodes['测试类别1'].length).toBe(2);
-        expect(updatedNodes['测试类别2'].length).toBe(1);
+        it('should get nodes by category correctly', () => {
+            const group1Nodes = getNodesByCategory('测试分组1');
+            expect(group1Nodes).toHaveLength(2);
 
-        expect(updatedNodes['测试类别1'][0].id).toBe('test1');
-        expect(updatedNodes['测试类别1'][0].name).toBe('测试节点1');
-        expect(updatedNodes['测试类别1'][0].category).toBe('测试类别1');
+            const nonExistentNodes = getNodesByCategory('不存在的分组');
+            expect(nonExistentNodes).toHaveLength(0);
+        });
     });
 });

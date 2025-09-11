@@ -2,6 +2,7 @@ import {load} from 'cheerio';
 import {Node} from "../types";
 import {COMPACT_NODES} from "./const";
 
+
 let DEFAULT_NODES: Record<string, Node[]> = {};
 
 const initializeDefaultNodes = (): void => {
@@ -18,23 +19,32 @@ initializeDefaultNodes();
 
 export const updateNodesFromHtml = (html: string): void => {
     try {
+        if (!html?.trim()) {
+            return;
+        }
+
         const $ = load(html);
         const newNodes: Record<string, Node[]> = {};
 
         $('optgroup').each((_, group) => {
             const category = $(group).attr('label');
-            if (!category) return;
+            if (!category) {
+                return;
+            }
 
             if (!newNodes[category]) {
                 newNodes[category] = [];
             }
 
-            $(group).find('option').each((_, option) => {
-                const id = $(option).attr('value');
-                const name = $(option).text().trim();
-                if (id && name) {
-                    newNodes[category].push({id, name, category});
+            $(group).find('option').each((_, node) => {
+                const id = $(node).attr('value');
+                const name = $(node).text().trim();
+
+                if (!id || !name) {
+                    return;
                 }
+
+                newNodes[category].push({id, name, category});
             });
         });
 
@@ -42,7 +52,7 @@ export const updateNodesFromHtml = (html: string): void => {
             DEFAULT_NODES = newNodes;
         }
     } catch {
-        // keep existing DEFAULT_NODES on error
+        /* empty */
     }
 };
 

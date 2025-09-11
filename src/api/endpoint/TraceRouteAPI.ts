@@ -1,5 +1,5 @@
-import {getRandomNodes} from "../../data/nodes";
-import {ClientOptions, TraceRouteParams} from '../../types.js';
+import {getRandomNodes, updateNodesFromHtml} from "../../data/nodes";
+import {APIResponse, ClientOptions, TraceRouteParams} from '../../types.js';
 import {_buildAPIRequest} from '../../utils.js';
 import {BaseAPI} from '../BaseAPI.js';
 
@@ -21,6 +21,16 @@ export class TraceRouteAPI extends BaseAPI<TraceRouteParams> {
         };
 
         return this.executeWithWebSocket(formData, onMessage);
+    }
+
+    async _makeHttpRequest(formData: Record<string, string>): Promise<APIResponse> {
+        const response = await super._makeHttpRequest(formData);
+
+        if (response.rawResponse) {
+            updateNodesFromHtml(await response.rawResponse.text());
+        }
+
+        return response;
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
