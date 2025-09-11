@@ -13,14 +13,12 @@ export class TraceRouteAPI extends BaseAPI<TraceRouteParams> {
     async execute(params: TraceRouteParams, onMessage?: (data: unknown) => void) {
         const selectedNodeId = params.node ? params.node : getRandomNodes()[0];
 
-        const formData: Record<string, string> = {
+        return this.executeWithWebSocket({
             node: selectedNodeId || '',
             target: params.host,
             dns_server_type: params.dnsServerType || 'isp',
             dns_server: params.dnsServerType === 'custom' && params.dnsServer ? params.dnsServer : ''
-        };
-
-        return this.executeWithWebSocket(formData, onMessage);
+        }, onMessage);
     }
 
     async _makeHttpRequest(formData: Record<string, string>): Promise<APIResponse> {

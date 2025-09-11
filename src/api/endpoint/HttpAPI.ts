@@ -10,7 +10,7 @@ export class HttpAPI extends BaseAPI<HttpParams> {
     }
 
     async execute(params: HttpParams, onMessage?: (data: unknown) => void) {
-        const formData: Record<string, string> = {
+        return this.executeWithWebSocket({
             line: params.line || '',
             host: params.host,
             host_s: params.host,
@@ -23,9 +23,7 @@ export class HttpAPI extends BaseAPI<HttpParams> {
             redirect_num: (params.redirectNum || 5).toString(),
             dns_server_type: params.dnsServerType || 'isp',
             dns_server: params.dnsServerType === 'custom' && params.dnsServer ? params.dnsServer : ''
-        };
-
-        return this.executeWithWebSocket(formData, onMessage);
+        }, onMessage);
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {

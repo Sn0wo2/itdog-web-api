@@ -12,15 +12,13 @@ export class PingAPI extends BaseAPI<PingParams> {
     }
 
     async execute(params: PingParams, onMessage?: (data: unknown) => void) {
-        const formData: Record<string, string> = {
+        return this.executeWithWebSocket({
             target: params.target,
             line: params.line || '',
             button_click: 'yes',
             dns_server_type: params.dnsServerType || 'isp',
             dns_server: params.dnsServerType === 'custom' && !params.dnsServer ? '' : params.dnsServer || ''
-        };
-
-        return this.executeWithWebSocket(formData, onMessage);
+        }, onMessage);
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
