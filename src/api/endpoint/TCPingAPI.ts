@@ -7,7 +7,7 @@ import {BaseAPI} from '../BaseAPI.js';
 export class TCPingAPI extends BaseAPI<TCPingParams> {
     constructor(options: ClientOptions) {
         super(options, {
-            endpoint: '/tcping/'
+            endpoint: 'tcping/'
         });
     }
 

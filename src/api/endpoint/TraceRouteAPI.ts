@@ -6,7 +6,7 @@ import {BaseAPI} from '../BaseAPI.js';
 export class TraceRouteAPI extends BaseAPI<TraceRouteParams> {
     constructor(options: ClientOptions) {
         super(options, {
-            endpoint: '/traceroute/'
+            endpoint: 'traceroute/'
         });
     }
 
@@ -15,7 +15,7 @@ export class TraceRouteAPI extends BaseAPI<TraceRouteParams> {
 
         return this.executeWithWebSocket({
             node: selectedNodeId || '',
-            target: params.host,
+            target: params.target,
             dns_server_type: params.dnsServerType || 'isp',
             dns_server: params.dnsServerType === 'custom' && params.dnsServer ? params.dnsServer : ''
         }, onMessage);

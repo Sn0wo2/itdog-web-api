@@ -5,7 +5,7 @@ import {BaseAPI} from '../BaseAPI.js';
 export class HttpAPI extends BaseAPI<HttpParams> {
     constructor(options: ClientOptions) {
         super(options, {
-            endpoint: '/http/'
+            endpoint: 'http'
         });
     }
 

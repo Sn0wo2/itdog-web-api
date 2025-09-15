@@ -12,7 +12,13 @@ export class WebSocketHandler {
             this.cleanup();
 
             try {
-                this.websocket = new WebSocket(config.url);
+                this.websocket = new WebSocket(config.url, {
+                    headers: {
+                        'Origin': new URL(config.url).origin,
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                        ...config.headers
+                    }
+                });
             } catch (error) {
                 reject(new Error(`Failed to create WebSocket: ${error}`));
                 return;
@@ -57,7 +63,7 @@ export class WebSocketHandler {
             this.websocket.onerror = (error) => {
                 this.isConnected = false;
                 clearTimeout(timeout);
-                reject(new Error(`WebSocket error: ${error}`));
+                reject(new Error(`WebSocket error: ${error.message}`));
             };
         });
     }

@@ -7,7 +7,7 @@ import {BaseAPI} from '../BaseAPI.js';
 export class PingAPI extends BaseAPI<PingParams> {
     constructor(options: ClientOptions) {
         super(options, {
-            endpoint: '/ping/'
+            endpoint: 'ping/'
         });
     }
 

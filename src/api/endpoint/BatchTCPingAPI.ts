@@ -4,7 +4,7 @@ import {BaseAPI} from '../BaseAPI.js';
 
 export class BatchTCPingAPI extends BaseAPI<BatchTCPingParams> {
     constructor(options: ClientOptions) {
-        super(options, {endpoint: '/batch_tcping/'});
+        super(options, {endpoint: 'batch_tcping'});
     }
 
     async execute(params: BatchTCPingParams, onMessage?: (data: unknown) => void) {
@@ -16,16 +16,14 @@ export class BatchTCPingAPI extends BaseAPI<BatchTCPingParams> {
             ? params.nodeIds
             : params.nodeIds ? params.nodeIds.split(',') : getRandomNodes();
 
-        const result = await this.executeWithWebSocket({
-            host: hostsWithPort.join('\r\n'),
-            port: params.port || '80',
-            cidr_filter: params.cidrFilter ? 'true' : 'false',
-            gateway: params.gateway || 'first',
-            node_id: selectedNodeIds.join(',')
-        }, onMessage);
-
         return {
-            ...result,
+            ...await this.executeWithWebSocket({
+                host: hostsWithPort.join('\r\n'),
+                port: params.port || '80',
+                cidr_filter: params.cidrFilter ? 'true' : 'false',
+                gateway: params.gateway || 'first',
+                node_id: selectedNodeIds.join(',')
+            }, onMessage),
             nodeIds: selectedNodeIds,
             availableNodes: getAllNodes()
         };
