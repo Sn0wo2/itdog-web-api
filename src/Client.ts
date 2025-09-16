@@ -1,4 +1,5 @@
 import {BatchTCPingAPI} from "./api/endpoint/BatchTCPingAPI.js";
+import {DNSAPI} from "./api/endpoint/DNSAPI.js";
 import {HttpAPI} from "./api/endpoint/HttpAPI.js";
 import {PingAPI} from "./api/endpoint/PingAPI.js";
 import {TCPingAPI} from "./api/endpoint/TCPingAPI.js";
@@ -8,6 +9,7 @@ import {API_BASE_URL} from "./data/const.js";
 import {
     BatchTCPingParams,
     ClientOptions,
+    DNSParams,
     GenericAPIConfig,
     HttpParams,
     PingParams,
@@ -46,6 +48,10 @@ export class Client {
 
     async traceRoute(options: TraceRouteParams, onMessage?: (data: unknown) => void) {
         return new TraceRouteAPI(this.options).execute(options, onMessage);
+    }
+
+    async dns(options: DNSParams, onMessage?: (data: unknown) => void) {
+        return new DNSAPI(this.options).execute(options, onMessage);
     }
 
     async generic(
