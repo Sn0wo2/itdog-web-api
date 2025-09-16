@@ -11,18 +11,20 @@ export class HttpAPI extends BaseAPI<HttpParams> {
 
     async execute(params: HttpParams, onMessage?: (data: unknown) => void) {
         return this.executeWithWebSocket({
-            line: params.line || '',
-            host: params.host,
-            host_s: params.host,
-            check_mode: params.checkMode || 'fast',
-            ipv4: params.ipv4 || '',
-            method: params.method || 'get',
-            referer: params.referer || '',
-            ua: params.userAgent || '',
-            cookies: params.cookies || '',
-            redirect_num: (params.redirectNum || 5).toString(),
-            dns_server_type: params.dnsServerType || 'isp',
-            dns_server: params.dnsServerType === 'custom' && params.dnsServer ? params.dnsServer : ''
+            formData: {
+                line: params.line || '',
+                host: params.host,
+                host_s: params.host,
+                check_mode: params.checkMode || 'fast',
+                ipv4: params.ipv4 || '',
+                method: params.method || 'get',
+                referer: params.referer || '',
+                ua: params.userAgent || '',
+                cookies: params.cookies || '',
+                redirect_num: (params.redirectNum || 5).toString(),
+                dns_server_type: params.dnsServerType || 'isp',
+                dns_server: params.dnsServerType === 'custom' && params.dnsServer ? params.dnsServer : ''
+            }
         }, onMessage);
     }
 

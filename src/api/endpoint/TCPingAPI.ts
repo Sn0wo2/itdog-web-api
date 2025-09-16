@@ -1,5 +1,4 @@
-import {TCPingParams} from "../../types";
-import {ClientOptions} from '../../types.js';
+import {ClientOptions, TCPingParams} from "../../types";
 import {_buildAPIRequest} from '../../utils.js';
 import {BaseAPI} from '../BaseAPI.js';
 
@@ -13,11 +12,13 @@ export class TCPingAPI extends BaseAPI<TCPingParams> {
 
     async execute(params: TCPingParams, onMessage?: (data: unknown) => void) {
         return this.executeWithWebSocket({
-            target: params.target,
-            line: params.line || '',
-            button_click: 'yes',
-            dns_server_type: params.dnsServerType || 'isp',
-            dns_server: params.dnsServerType === 'custom' && params.dnsServer ? params.dnsServer : ''
+            formData: {
+                target: params.target,
+                line: params.line || '',
+                button_click: 'yes',
+                dns_server_type: params.dnsServerType || 'isp',
+                dns_server: params.dnsServerType === 'custom' && params.dnsServer ? params.dnsServer : ''
+            }
         }, onMessage);
     }
 

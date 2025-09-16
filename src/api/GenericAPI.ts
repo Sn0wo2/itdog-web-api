@@ -14,7 +14,7 @@ export class GenericAPI extends BaseAPI<GenericAPIParams> {
     }
 
     async execute(params: GenericAPIParams, onMessage?: (data: unknown) => void): Promise<APIResult> {
-        return this.executeWithWebSocket(params as Record<string, string>, onMessage);
+        return this.executeWithWebSocket({formData: params as Record<string, string>}, onMessage);
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {

@@ -18,11 +18,13 @@ export class BatchTCPingAPI extends BaseAPI<BatchTCPingParams> {
 
         return {
             ...await this.executeWithWebSocket({
-                host: hostsWithPort.join('\r\n'),
-                port: params.port || '80',
-                cidr_filter: params.cidrFilter ? 'true' : 'false',
-                gateway: params.gateway || 'first',
-                node_id: selectedNodeIds.join(',')
+                formData: {
+                    host: hostsWithPort.join('\r\n'),
+                    port: params.port || '80',
+                    cidr_filter: params.cidrFilter ? 'true' : 'false',
+                    gateway: params.gateway || 'first',
+                    node_id: selectedNodeIds.join(',')
+                }
             }, onMessage),
             nodeIds: selectedNodeIds,
             availableNodes: getAllNodes()

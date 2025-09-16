@@ -14,22 +14,28 @@ export interface WebSocketConfig {
     url: string;
     initialMessage?: WebSocketMessage;
     timeout?: number;
+    headers?: Record<string, string>;
 }
 
 export interface APIResponse {
     task_id: string;
     wss_url: string;
+    rawRequest: RequestInit & {
+        url: string | URL;
+    };
     rawResponse?: Response;
 
     [key: string]: unknown;
 }
 
-export interface RequestConfig {
-    url: string;
-    method?: string;
-    headers?: Record<string, string>;
-    body?: string | URLSearchParams;
-    timeout?: number;
+export interface RequestConfig extends RequestInit {
+    rawRequest: RequestInit & {
+        url: string | URL;
+    };
+}
+
+export interface ExecuteWithWebSocketConfig {
+    formData: Record<string, string>;
 }
 
 export interface APIConfig {
@@ -102,8 +108,16 @@ export interface HttpParams {
 }
 
 export interface TraceRouteParams {
-    host: string;
+    target: string;
     node?: string;
+    dnsServerType?: 'isp' | 'custom';
+    dnsServer?: string;
+}
+
+export interface DNSParams {
+    domain: string;
+    line?: string;
+    dnsType?: 'a' | 'cname' | 'mx' | 'aaaa' | 'ns' | 'txt' | 'ptr' | 'srv';
     dnsServerType?: 'isp' | 'custom';
     dnsServer?: string;
 }

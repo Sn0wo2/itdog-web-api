@@ -1,50 +1,61 @@
 import {load} from 'cheerio';
+import * as cookie from 'cookie';
+import {Headers} from "undici";
+import {SafeGuardCalculator} from "./guard/Bridge";
 import type {APIResponse, RequestConfig} from './types.js';
 import {_findTaskIdScript, _parseScriptVariables} from './utils.js';
 
 
 export class Request {
     static async makeRequest(config: RequestConfig): Promise<APIResponse> {
-        const controller = new AbortController();
-        const timeoutId = config.timeout ? setTimeout(() => controller.abort(), config.timeout) : null;
+        const response = await fetch(config.rawRequest.url, config.rawRequest);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
 
-        try {
-            const response = await fetch(config.url, {
-                method: config.method || 'POST',
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    ...config.headers,
-                },
-                body: config.body,
-                signal: controller.signal,
-            });
+        const html = await response.text();
+        if (html === `<script src="/_guard/auto.js"></script>`) {
+            const guard = response.headers
+                .getSetCookie()
+                .map(c => cookie.parse(c).guard)
+                .find(Boolean);
 
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            if (!guard) throw new Error('Cannot find guard cookie in response');
+
+            const rawHeaders = new Headers(config.rawRequest.headers);
+            const originalCookie = rawHeaders.get("cookie") || '';
+            const parsed = cookie.parse(originalCookie);
+
+            parsed.guard = guard;
+            const guardRet = new SafeGuardCalculator().calculate(guard);
+            if (guardRet !== null) {
+                parsed.guardret = guardRet;
             }
 
-            const html = await response.text();
-            const parsedResponse = this.parseResponse(html);
+            const newCookie = Object.entries(parsed)
+                .map(([key, value]) => cookie.serialize(key, value as string))
+                .join('; ');
 
-            const customResponse = {
+            return this.makeRequest({
+                ...config,
+                rawRequest: {
+                    ...config.rawRequest,
+                    headers: {
+                        ...config.rawRequest.headers,
+                        cookie: newCookie
+                    }
+                }
+            });
+        }
+
+        return {
+            ...this.parseResponse(html),
+            rawRequest: config.rawRequest,
+            rawResponse: {
                 ...response,
                 text: async () => html
-            };
-
-            return {
-                ...parsedResponse,
-                rawResponse: customResponse
-            };
-        } catch (error) {
-            if (error instanceof Error && error.name === 'AbortError') {
-                throw new Error(`Request timeout after ${config.timeout}ms`);
             }
-            throw error;
-        } finally {
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        }
+        };
     }
 
     static parseResponse(html: string): APIResponse {

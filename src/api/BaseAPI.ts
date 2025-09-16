@@ -1,6 +1,13 @@
 import {ITDOG_HASH_TOKEN} from "../data/const";
 import {Request} from '../Request.js';
-import type {APIConfig, APIResponse, APIResult, ClientOptions} from '../types.js';
+import type {
+    APIConfig,
+    APIResponse,
+    APIResult,
+    ClientOptions,
+    ExecuteWithWebSocketConfig,
+    WebSocketConfig
+} from '../types.js';
 import {_md5_16} from '../utils.js';
 import {WebSocketHandler} from '../WebSocketHandler.js';
 
@@ -19,8 +26,7 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
     abstract execute(params: T, onMessage?: (data: unknown) => void): Promise<R>;
 
     async request(params: T): Promise<APIResponse> {
-        const response = await this._makeHttpRequest(params as Record<string, string>);
-        return response as APIResponse;
+        return await this._makeHttpRequest(params as Record<string, string>) as APIResponse;
     }
 
     getWebSocketHandler(): WebSocketHandler {
@@ -32,16 +38,18 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
     }
 
     async _makeHttpRequest(formData: Record<string, string>): Promise<APIResponse> {
-        const {url, formData: processedFormData} = this.buildRequest(formData);
+        const {url, formData: processedFormData} = this.buildRequest(formData)
+        
         return await Request.makeRequest({
-            url,
-            method: this.config.method || "POST",
-            headers: {
-                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-                "content-type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams(processedFormData).toString(),
-            timeout: 30000,
+            rawRequest: {
+                url,
+                method: this.config.method || "POST",
+                headers: {
+                    "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                    "content-type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(processedFormData).toString(),
+            }
         });
     }
 
@@ -75,26 +83,34 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
     };
 
     protected async executeWithWebSocket(
-        formData: Record<string, string>,
+        config: ExecuteWithWebSocketConfig,
         onMessage?: (data: unknown) => void
     ): Promise<APIResult> {
-        const response = await this._makeHttpRequest(formData);
+        const response = await this._makeHttpRequest(config.formData);
 
         if (!response.task_id || !response.wss_url) {
             throw new Error('Invalid API response: missing task_id or wss_url');
         }
 
         const taskToken = _md5_16(response.task_id + (this.options.hashToken || ITDOG_HASH_TOKEN));
-        const result = this.createResult(response.task_id, taskToken, response.wss_url, response);
 
-        await this.wsHandler.connect({
+        const wsCfg: WebSocketConfig = {
             url: response.wss_url,
             initialMessage: {
                 task_id: response.task_id,
                 task_token: taskToken,
-            }
-        }, onMessage);
+            },
+        }
 
-        return result;
+        if (response.rawRequest.headers) {
+            wsCfg.headers = {
+                "origin": new URL(response.rawRequest.url).origin,
+                "user-agent": new Headers(response.rawRequest.headers).get('user-agent') || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0'
+            }
+        }
+
+        await this.wsHandler.connect(wsCfg, onMessage);
+
+        return this.createResult(response.task_id, taskToken, response.wss_url, response);
     }
 }
