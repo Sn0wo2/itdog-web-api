@@ -1,4 +1,4 @@
-import {BatchTCPingParams, Client, HttpParams, PingParams, TCPingParams, TraceRouteParams} from '../src';
+import {BatchTCPingParams, Client, DNSParams, HttpParams, PingParams, TCPingParams, TraceRouteParams} from '../src';
 
 export interface TestConfig {
     name: string;
@@ -47,6 +47,9 @@ export class TestRunner {
                     break;
                 case 'trace route':
                     result = await this.client.traceRoute(test.params as TraceRouteParams, this.defaultMessageHandler);
+                    break;
+                case 'dns':
+                    result = await this.client.dns(test.params as DNSParams, this.defaultMessageHandler);
                     break;
                 default:
                     throw new Error(`Unknown test type: ${test.name}`);
@@ -134,11 +137,22 @@ export const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     },
     {
         name: 'Trace Route',
-        enabled: true,
+        enabled: false,
         params: {
             host: 'www.baidu.com',
             dns_server_type: 'isp',
             dns_server: ''
+        }
+    },
+    {
+        name: 'DNS',
+        enabled: true,
+        params: {
+            domain: 'picker.me0wo.cc',
+            line: '',
+            dnsType: 'a',
+            dnsServerType: 'isp',
+            dnsServer: ''
         }
     }
 ];
@@ -182,6 +196,17 @@ export const DEFAULT_GENERIC_API_TESTS: APITestConfig[] = [
             ua: '',
             cookies: '',
             redirect_num: '5',
+            dns_server_type: 'isp',
+            dns_server: ''
+        }
+    },
+    {
+        name: 'Generic API (DNS)',
+        enabled: true,
+        endpoint: '/dns/picker.me0wo.cc',
+        params: {
+            line: '',
+            dns_type: 'a',
             dns_server_type: 'isp',
             dns_server: ''
         }
