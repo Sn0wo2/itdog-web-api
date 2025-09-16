@@ -115,7 +115,7 @@ export interface TraceRouteParams {
 }
 
 export interface DNSParams {
-    domain: string;
+    target: string;
     line?: string;
     dnsType?: 'a' | 'cname' | 'mx' | 'aaaa' | 'ns' | 'txt' | 'ptr' | 'srv';
     dnsServerType?: 'isp' | 'custom';

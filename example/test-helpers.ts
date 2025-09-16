@@ -148,7 +148,7 @@ export const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
         name: 'DNS',
         enabled: true,
         params: {
-            domain: 'picker.me0wo.cc',
+            target: 'www.baidu.com',
             line: '',
             dnsType: 'a',
             dnsServerType: 'isp',
@@ -166,47 +166,6 @@ export const DEFAULT_GENERIC_API_TESTS: APITestConfig[] = [
             target: 'baidu.com',
             line: '1,3,5',
             button_click: 'yes',
-            dns_server_type: 'isp',
-            dns_server: ''
-        }
-    },
-    {
-        name: 'Custom API (TCPing)',
-        enabled: false,
-        endpoint: '/tcping/',
-        method: 'POST',
-        params: {
-            target: 'openrouter.ai:443',
-            line: '1,3,5',
-            button_click: 'yes'
-        }
-    },
-    {
-        name: 'Generic API (HTTP)',
-        enabled: false,
-        endpoint: '/http/',
-        params: {
-            line: '',
-            host: 'https://www.baidu.com',
-            host_s: 'www.baidu.com',
-            check_mode: 'fast',
-            ipv4: '',
-            method: 'get',
-            referer: '',
-            ua: '',
-            cookies: '',
-            redirect_num: '5',
-            dns_server_type: 'isp',
-            dns_server: ''
-        }
-    },
-    {
-        name: 'Generic API (DNS)',
-        enabled: true,
-        endpoint: '/dns/picker.me0wo.cc',
-        params: {
-            line: '',
-            dns_type: 'a',
             dns_server_type: 'isp',
             dns_server: ''
         }

@@ -10,14 +10,15 @@ export class DNSAPI extends BaseAPI<DNSParams> {
     }
 
     async execute(params: DNSParams, onMessage?: (data: unknown) => void) {
-        const formData = {
-            target: params.domain,
-            line: params.line || '',
-            dns_type: params.dnsType || 'a',
-            dns_server_type: params.dnsServerType || 'isp',
-            dns_server: params.dnsServerType === 'custom' && params.dnsServer ? params.dnsServer : ''
-        };
-        return this.executeWithWebSocket({formData}, onMessage);
+        return this.executeWithWebSocket({
+            formData: {
+                target: params.target,
+                line: params.line || '',
+                dns_type: params.dnsType || 'a',
+                dns_server_type: params.dnsServerType || 'isp',
+                dns_server: params.dnsServerType === 'custom' && params.dnsServer ? params.dnsServer : ''
+            }
+        }, onMessage);
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {

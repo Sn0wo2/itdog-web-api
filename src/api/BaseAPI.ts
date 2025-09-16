@@ -39,7 +39,7 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
 
     async _makeHttpRequest(formData: Record<string, string>): Promise<APIResponse> {
         const {url, formData: processedFormData} = this.buildRequest(formData)
-        
+
         return await Request.makeRequest({
             rawRequest: {
                 url,
