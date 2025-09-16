@@ -9,7 +9,14 @@ const jestConfig: JestConfigWithTsJest = {
     coverageDirectory: 'coverage',
     coverageReporters: ['text', 'lcov', 'html'],
     transform: {
-        '^.+\\.ts$': ['ts-jest', {useESM: true}]
+        '^.+\\.ts$': ['ts-jest', {
+            useESM: true,
+            tsconfig: {
+                allowJs: true,
+                module: 'esnext',
+                target: 'es2022'
+            }
+        }]
     },
     moduleNameMapper: {
         '^(\\.{1,2}/.*)\\.js$': '$1'

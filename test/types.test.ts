@@ -53,6 +53,9 @@ describe('Types', () => {
             const response: APIResponse = {
                 task_id: 'test123',
                 wss_url: 'wss://example.com',
+                rawRequest: {
+                    url: 'https://example.com'
+                },
                 additional_data: 'value'
             };
 
