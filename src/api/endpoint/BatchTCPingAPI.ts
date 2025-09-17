@@ -1,6 +1,6 @@
-import {getAllNodes, getRandomNodes, updateNodesFromHtml} from '../../data/nodes.js';
-import {APIResponse, BatchTCPingParams, ClientOptions} from '../../types.js';
-import {BaseAPI} from '../BaseAPI.js';
+import {BaseAPI} from '@/api/BaseAPI'
+import {getAllNodes, getRandomNodes, updateNodesFromHtml} from '@/data/nodes'
+import type {APIResponse, BatchTCPingParams, ClientOptions} from '@/types'
 
 export class BatchTCPingAPI extends BaseAPI<BatchTCPingParams> {
     constructor(options: ClientOptions) {

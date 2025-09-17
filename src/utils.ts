@@ -1,7 +1,5 @@
-import {createHash} from "crypto";
-import type {CheerioNode} from "./types";
-
-import type {CheerioAPI} from './types.js';
+import type {CheerioAPI, CheerioNode} from '@/types'
+import {createHash} from 'crypto'
 
 /**
  * itdog task_token need 16 md5

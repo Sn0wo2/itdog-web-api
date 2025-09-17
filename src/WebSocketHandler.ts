@@ -1,6 +1,6 @@
+import {API_BASE_URL} from '@/data/const'
+import type {WebSocketConfig} from '@/types'
 import {WebSocket} from 'ws';
-import {API_BASE_URL} from "./data/const";
-import type {WebSocketConfig} from './types.js';
 
 
 export class WebSocketHandler {

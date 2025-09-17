@@ -1,7 +1,7 @@
-import {getRandomNodes, updateNodesFromHtml} from "../../data/nodes";
-import {APIResponse, ClientOptions, TraceRouteParams} from '../../types.js';
-import {_buildAPIRequest} from '../../utils.js';
-import {BaseAPI} from '../BaseAPI.js';
+import {BaseAPI} from '@/api/BaseAPI'
+import {getRandomNodes, updateNodesFromHtml} from '@/data/nodes'
+import type {APIResponse, ClientOptions, TraceRouteParams} from '@/types'
+import {_buildAPIRequest} from '@/utils'
 
 export class TraceRouteAPI extends BaseAPI<TraceRouteParams> {
     constructor(options: ClientOptions) {

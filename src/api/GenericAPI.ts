@@ -1,5 +1,5 @@
-import {APIResult, ClientOptions, GenericAPIConfig, GenericAPIParams} from '../types.js';
-import {BaseAPI} from './BaseAPI.js';
+import {BaseAPI} from '@/api/BaseAPI'
+import type {APIResult, ClientOptions, GenericAPIConfig, GenericAPIParams} from '@/types'
 
 
 export class GenericAPI extends BaseAPI<GenericAPIParams> {

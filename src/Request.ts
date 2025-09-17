@@ -1,9 +1,8 @@
+import {SafeGuardCalculator} from '@/guard/Bridge'
+import type {APIResponse, RequestConfig} from '@/types'
+import {_findTaskIdScript, _parseScriptVariables} from '@/utils'
 import {load} from 'cheerio';
 import * as cookie from 'cookie';
-import {Headers} from "undici";
-import {SafeGuardCalculator} from "./guard/Bridge";
-import type {APIResponse, RequestConfig} from './types.js';
-import {_findTaskIdScript, _parseScriptVariables} from './utils.js';
 
 
 export class Request {

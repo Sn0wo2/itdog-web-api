@@ -1,6 +1,6 @@
-import {ClientOptions, HttpParams} from '../../types.js';
-import {_buildAPIRequest} from '../../utils.js';
-import {BaseAPI} from '../BaseAPI.js';
+import {BaseAPI} from '@/api/BaseAPI'
+import type {ClientOptions, HttpParams} from '@/types'
+import {_buildAPIRequest} from '@/utils'
 
 export class HttpAPI extends BaseAPI<HttpParams> {
     constructor(options: ClientOptions) {

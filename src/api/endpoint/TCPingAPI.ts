@@ -1,6 +1,6 @@
-import {ClientOptions, TCPingParams} from "../../types";
-import {_buildAPIRequest} from '../../utils.js';
-import {BaseAPI} from '../BaseAPI.js';
+import {BaseAPI} from '@/api/BaseAPI'
+import type {ClientOptions, TCPingParams} from '@/types'
+import {_buildAPIRequest} from '@/utils'
 
 
 export class TCPingAPI extends BaseAPI<TCPingParams> {

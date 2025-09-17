@@ -1,6 +1,6 @@
-import {load} from 'cheerio';
-import {Node} from "../types";
-import {COMPACT_NODES} from "./const";
+import {COMPACT_NODES} from '@/data/const'
+import type {Node} from '@/types'
+import {load} from 'cheerio'
 
 
 let DEFAULT_NODES: Record<string, Node[]> = {};

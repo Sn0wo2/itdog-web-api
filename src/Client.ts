@@ -1,12 +1,12 @@
-import {BatchTCPingAPI} from "./api/endpoint/BatchTCPingAPI.js";
-import {DNSAPI} from "./api/endpoint/DNSAPI.js";
-import {HttpAPI} from "./api/endpoint/HttpAPI.js";
-import {PingAPI} from "./api/endpoint/PingAPI.js";
-import {TCPingAPI} from "./api/endpoint/TCPingAPI.js";
-import {TraceRouteAPI} from "./api/endpoint/TraceRouteAPI";
-import {GenericAPI} from "./api/GenericAPI.js";
-import {API_BASE_URL} from "./data/const.js";
-import {
+import {BatchTCPingAPI} from '@/api/endpoint/BatchTCPingAPI'
+import {DNSAPI} from '@/api/endpoint/DNSAPI'
+import {HttpAPI} from '@/api/endpoint/HttpAPI'
+import {PingAPI} from '@/api/endpoint/PingAPI'
+import {TCPingAPI} from '@/api/endpoint/TCPingAPI'
+import {TraceRouteAPI} from '@/api/endpoint/TraceRouteAPI'
+import {GenericAPI} from '@/api/GenericAPI'
+import {API_BASE_URL} from '@/data/const'
+import type {
     BatchTCPingParams,
     ClientOptions,
     DNSParams,
@@ -15,7 +15,7 @@ import {
     PingParams,
     TCPingParams,
     TraceRouteParams
-} from './types.js';
+} from '@/types'
 
 export class Client {
     private readonly options: ClientOptions;

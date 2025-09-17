@@ -1,5 +1,5 @@
-import {ITDOG_HASH_TOKEN} from "../data/const";
-import {Request} from '../Request.js';
+import {ITDOG_HASH_TOKEN} from '@/data/const'
+import {Request} from '@/Request'
 import type {
     APIConfig,
     APIResponse,
@@ -7,9 +7,9 @@ import type {
     ClientOptions,
     ExecuteWithWebSocketConfig,
     WebSocketConfig
-} from '../types.js';
-import {_md5_16} from '../utils.js';
-import {WebSocketHandler} from '../WebSocketHandler.js';
+} from '@/types'
+import {_md5_16} from '@/utils'
+import {WebSocketHandler} from '@/WebSocketHandler'
 
 
 export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {

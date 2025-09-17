@@ -1,30 +1,24 @@
-import fs from 'fs'
-import path from 'path'
-import {fileURLToPath} from 'url'
-import vm from 'vm'
+import fs from 'fs';import vm from 'vm'
+import fs from 'fs';
+import path from 'path';
+import {fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const guardScript = fs.readFileSync(path.join(__dirname, '_guard_auto.js'), 'utf-8');
 
 type GuardFn = (guardValue: string) => string | null
 
 export class SafeGuardCalculator {
-    private readonly scriptCode: string
     private vmScript: vm.Script
 
     constructor() {
-        const scriptPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '_guard_auto.js');
-
         try {
-            this.scriptCode = fs.readFileSync(scriptPath, 'utf8');
+            this.vmScript = new vm.Script(guardScript, { filename: '_guard_auto.js' });
         } catch (error) {
-            throw new Error(`Failed to load script: ${scriptPath}. ${error instanceof Error ? error.message : String(error)}`);
+            throw new Error(`Failed to create vm.Script: ${error}`)
         }
-
-        if (!this.scriptCode) {
-            throw new Error(`Failed to load script: ${scriptPath}`);
-        }
-
-        this.vmScript = new vm.Script(this.scriptCode, {
-            filename: path.basename(scriptPath),
-        });
     }
 
     calculate(guardValue: string): string | null {
@@ -53,28 +47,28 @@ export class SafeGuardCalculator {
             },
         }
 
-        sandbox.globalThis.document = {
+        sandbox.globalThis.document={
             get cookie(): string {
                 return sandbox._fakeCookieStore;
             },
             set cookie(value) {
-                const [name, val] = value.split(';')[0].split('=');
+                const [name, val]=value.split(';')[0].split('=');
                 if (name && val) {
                     if (name.trim() === 'guardret') {
-                        sandbox._capturedGuardret = val;
+                        sandbox._capturedGuardret=val;
                     }
-                    sandbox._fakeCookieStore = value;
+                    sandbox._fakeCookieStore=value;
                 }
             },
         };
 
-        sandbox.calculateGuardRet = function (guardValue: string): string | null {
-            sandbox._fakeCookieStore = '';
-            sandbox._capturedGuardret = null;
+        sandbox.calculateGuardRet = function(guardValue: string): string | null {
+            sandbox._fakeCookieStore='';
+            sandbox._capturedGuardret=null;
 
-            sandbox.document.cookie = `guard=${guardValue}`;
+            sandbox.document.cookie=`guard=${guardValue}`;
 
-            const guard = sandbox.getCookie('guard');
+            const guard=sandbox.getCookie('guard');
             if (!guard) {
                 throw new Error("Missing guard cookie")
             }
