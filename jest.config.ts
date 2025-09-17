@@ -11,11 +11,7 @@ const jestConfig: JestConfigWithTsJest = {
     transform: {
         '^.+\\.ts$': ['ts-jest', {
             useESM: true,
-            tsconfig: {
-                allowJs: true,
-                module: 'esnext',
-                target: 'es2022'
-            }
+            tsconfig: './tsconfig.json'
         }]
     },
     moduleNameMapper: {
