@@ -158,7 +158,7 @@ const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
 const DEFAULT_GENERIC_API_TESTS: APITestConfig[] = [
   {
     name: 'Generic API (Ping)',
-    enabled: false,
+      enabled: true,
     endpoint: '/ping/',
     params: {
       target: 'baidu.com',
