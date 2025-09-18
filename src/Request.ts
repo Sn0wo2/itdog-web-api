@@ -7,7 +7,9 @@ import * as cookie from 'cookie';
 
 export class Request {
     static async makeRequest(config: RequestConfig): Promise<APIResponse> {
-        const response = await fetch(config.rawRequest.url, config.rawRequest);
+        //eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const fetchClient = (config as any).fetch || fetch;
+        const response = await fetchClient(config.rawRequest.url, config.rawRequest);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
@@ -16,7 +18,7 @@ export class Request {
         if (html === `<script src="/_guard/auto.js"></script>`) {
             const guard = response.headers
                 .getSetCookie()
-                .map(c => cookie.parse(c).guard)
+                .map((c: string) => cookie.parse(c).guard)
                 .find(Boolean);
 
             if (!guard) throw new Error('Cannot find guard cookie in response');

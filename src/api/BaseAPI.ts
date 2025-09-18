@@ -49,7 +49,9 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
                     "content-type": "application/x-www-form-urlencoded",
                 },
                 body: new URLSearchParams(processedFormData).toString(),
-            }
+            },
+            //eslint-disable-next-line @typescript-eslint/no-explicit-any
+            fetch: (this.options as any).fetch
         });
     }
 

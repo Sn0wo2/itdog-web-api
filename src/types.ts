@@ -1,6 +1,7 @@
 export interface ClientOptions {
     baseURL?: string;
     hashToken?: string;
+    fetch?: typeof fetch;
 }
 
 export interface WebSocketMessage {
@@ -32,6 +33,7 @@ export interface RequestConfig extends RequestInit {
     rawRequest: RequestInit & {
         url: string | URL;
     };
+    fetch?: typeof fetch;
 }
 
 export interface ExecuteWithWebSocketConfig {
