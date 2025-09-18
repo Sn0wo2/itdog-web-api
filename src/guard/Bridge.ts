@@ -1,7 +1,7 @@
-import fs from 'fs';import vm from 'vm'
 import fs from 'fs';
 import path from 'path';
-import {fileURLToPath } from 'url';
+import {fileURLToPath} from 'url';
+import vm from 'vm'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,11 +11,11 @@ const guardScript = fs.readFileSync(path.join(__dirname, '_guard_auto.js'), 'utf
 type GuardFn = (guardValue: string) => string | null
 
 export class SafeGuardCalculator {
-    private vmScript: vm.Script
+    private readonly vmScript: vm.Script
 
     constructor() {
         try {
-            this.vmScript = new vm.Script(guardScript, { filename: '_guard_auto.js' });
+            this.vmScript = new vm.Script(guardScript, {filename: '_guard_auto.js'});
         } catch (error) {
             throw new Error(`Failed to create vm.Script: ${error}`)
         }
@@ -47,28 +47,28 @@ export class SafeGuardCalculator {
             },
         }
 
-        sandbox.globalThis.document={
+        sandbox.globalThis.document = {
             get cookie(): string {
                 return sandbox._fakeCookieStore;
             },
             set cookie(value) {
-                const [name, val]=value.split(';')[0].split('=');
+                const [name, val] = value.split(';')[0].split('=');
                 if (name && val) {
                     if (name.trim() === 'guardret') {
-                        sandbox._capturedGuardret=val;
+                        sandbox._capturedGuardret = val;
                     }
-                    sandbox._fakeCookieStore=value;
+                    sandbox._fakeCookieStore = value;
                 }
             },
         };
 
-        sandbox.calculateGuardRet = function(guardValue: string): string | null {
-            sandbox._fakeCookieStore='';
-            sandbox._capturedGuardret=null;
+        sandbox.calculateGuardRet = function (guardValue: string): string | null {
+            sandbox._fakeCookieStore = '';
+            sandbox._capturedGuardret = null;
 
-            sandbox.document.cookie=`guard=${guardValue}`;
+            sandbox.document.cookie = `guard=${guardValue}`;
 
-            const guard=sandbox.getCookie('guard');
+            const guard = sandbox.getCookie('guard');
             if (!guard) {
                 throw new Error("Missing guard cookie")
             }

@@ -1,6 +1,7 @@
 import {BaseAPI} from '@/api/BaseAPI'
 import {getAllNodes, getRandomNodes, updateNodesFromHtml} from '@/data/nodes'
 import type {APIResponse, BatchTCPingParams, ClientOptions} from '@/types'
+import {buildAPIRequest} from "@/utils";
 
 export class BatchTCPingAPI extends BaseAPI<BatchTCPingParams> {
     constructor(options: ClientOptions) {
@@ -12,9 +13,14 @@ export class BatchTCPingAPI extends BaseAPI<BatchTCPingParams> {
             host.includes(':') ? host : `${host}:${params.port || '80'}`
         );
 
-        const selectedNodeIds = Array.isArray(params.nodeIds)
-            ? params.nodeIds
-            : params.nodeIds ? params.nodeIds.split(',') : getRandomNodes();
+        let selectedNodeIds: string[];
+        if (Array.isArray(params.nodeIds)) {
+            selectedNodeIds = params.nodeIds;
+        } else if (params.nodeIds) {
+            selectedNodeIds = params.nodeIds.split(',');
+        } else {
+            selectedNodeIds = getRandomNodes();
+        }
 
         return {
             ...await this.executeWithWebSocket({
@@ -42,6 +48,6 @@ export class BatchTCPingAPI extends BaseAPI<BatchTCPingParams> {
     }
 
     protected buildRequest(formData: Record<string, string>) {
-        return {url: `${this.options.baseURL}${this.config.endpoint}`, formData};
+        return buildAPIRequest(this.options.baseURL as string, this.config.endpoint, formData);
     }
 }

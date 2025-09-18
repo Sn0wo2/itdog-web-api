@@ -26,7 +26,7 @@ export abstract class BaseAPI<T = Record<string, unknown>, R = APIResult> {
     abstract execute(params: T, onMessage?: (data: unknown) => void): Promise<R>;
 
     async request(params: T): Promise<APIResponse> {
-        return await this._makeHttpRequest(params as Record<string, string>) as APIResponse;
+        return await this._makeHttpRequest(params as Record<string, string>);
     }
 
     getWebSocketHandler(): WebSocketHandler {

@@ -1,6 +1,6 @@
 import {BaseAPI} from '@/api/BaseAPI'
 import type {ClientOptions, DNSParams} from '@/types'
-import {_buildAPIRequest} from '@/utils'
+import {buildAPIRequestWithTarget} from "@/utils";
 
 export class DNSAPI extends BaseAPI<DNSParams> {
     constructor(options: ClientOptions) {
@@ -22,6 +22,6 @@ export class DNSAPI extends BaseAPI<DNSParams> {
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
-        return _buildAPIRequest(this.options.baseURL as string, this.config.endpoint, formData, true);
+        return buildAPIRequestWithTarget(this.options.baseURL as string, this.config.endpoint, formData);
     }
 }

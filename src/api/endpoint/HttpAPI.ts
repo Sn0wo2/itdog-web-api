@@ -1,6 +1,6 @@
 import {BaseAPI} from '@/api/BaseAPI'
 import type {ClientOptions, HttpParams} from '@/types'
-import {_buildAPIRequest} from '@/utils'
+import {buildAPIRequest} from '@/utils'
 
 export class HttpAPI extends BaseAPI<HttpParams> {
     constructor(options: ClientOptions) {
@@ -29,6 +29,6 @@ export class HttpAPI extends BaseAPI<HttpParams> {
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
-        return _buildAPIRequest(this.options.baseURL as string, this.config.endpoint, formData, true);
+        return buildAPIRequest(this.options.baseURL as string, this.config.endpoint, formData);
     }
 }

@@ -58,7 +58,7 @@ export const _findTaskIdScript = ($: CheerioAPI): string | null => {
             }
         }
 
-        if (content && content.includes('task_id')) {
+        if (content?.includes('task_id')) {
             scriptContent = content;
             return false;
         }
@@ -66,22 +66,25 @@ export const _findTaskIdScript = ($: CheerioAPI): string | null => {
     return scriptContent;
 };
 
-export const _buildAPIRequest = (
+export const buildAPIRequestWithTarget = (
     baseURL: string,
     endpoint: string,
     formData: Record<string, string>,
-    useTargetInURL: boolean = true
 ): { url: string; formData: Record<string, string> } => {
-    if (useTargetInURL) {
-        const url = `${baseURL}${endpoint}${extractHostname(formData['target']) || ''}`;
+    const url = `${baseURL}${endpoint}${extractHostname(formData['target']) || ''}`;
 
-        const restFormData = {...formData};
-        delete restFormData['target'];
-        return {url, formData: restFormData};
-    } else {
-        const url = `${baseURL}${endpoint}`;
-        return {url, formData};
-    }
+    const restFormData = {...formData};
+    delete restFormData['target'];
+    return {url, formData: restFormData};
+};
+
+export const buildAPIRequest = (
+    baseURL: string,
+    endpoint: string,
+    formData: Record<string, string>
+): { url: string; formData: Record<string, string> } => {
+    const url = `${baseURL}${endpoint}`;
+    return {url, formData};
 };
 
 const extractHostname = (url: string): string => {

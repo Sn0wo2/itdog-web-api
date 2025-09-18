@@ -3,7 +3,7 @@ import type {APIResult, ClientOptions, GenericAPIConfig, GenericAPIParams} from 
 
 
 export class GenericAPI extends BaseAPI<GenericAPIParams> {
-    private apiConfig: GenericAPIConfig;
+    private readonly apiConfig: GenericAPIConfig;
 
     constructor(options: ClientOptions, config: GenericAPIConfig) {
         super(options, {

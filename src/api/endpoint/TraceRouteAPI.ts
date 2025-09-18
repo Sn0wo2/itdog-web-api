@@ -1,7 +1,7 @@
 import {BaseAPI} from '@/api/BaseAPI'
 import {getRandomNodes, updateNodesFromHtml} from '@/data/nodes'
 import type {APIResponse, ClientOptions, TraceRouteParams} from '@/types'
-import {_buildAPIRequest} from '@/utils'
+import {buildAPIRequestWithTarget} from '@/utils'
 
 export class TraceRouteAPI extends BaseAPI<TraceRouteParams> {
     constructor(options: ClientOptions) {
@@ -33,6 +33,6 @@ export class TraceRouteAPI extends BaseAPI<TraceRouteParams> {
     }
 
     protected buildRequest(formData: Record<string, string>): { url: string; formData: Record<string, string> } {
-        return _buildAPIRequest(this.options.baseURL as string, this.config.endpoint, formData, true);
+        return buildAPIRequestWithTarget(this.options.baseURL as string, this.config.endpoint, formData);
     }
 }
