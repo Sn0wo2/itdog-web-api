@@ -94,7 +94,8 @@ const extractHostname = (url: string): string => {
     try {
         return new URL(url).hostname;
     } catch {
-        const match = /^(?:https?:\/\/)?([^\/]+)/.exec(url);
+        const regex = /^(?:https?:\/\/)?([^/]+)/;
+        const match = regex.exec(url);
         return match ? match[1] : url;
     }
 }

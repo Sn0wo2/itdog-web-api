@@ -1,4 +1,4 @@
-import {_buildAPIRequest, _md5_16, _parseScriptVariables} from '@/utils'
+import {_md5_16, _parseScriptVariables, buildAPIRequest, buildAPIRequestWithTarget} from '@/utils'
 import {describe, expect, test} from 'vitest'
 
 describe('Utils', () => {
@@ -89,11 +89,10 @@ describe('Utils', () => {
 
     describe('buildApiRequest', () => {
         test('builds request with target in URL', () => {
-            const result = _buildAPIRequest(
+            const result = buildAPIRequestWithTarget(
                 'https://api.example.com',
                 '/ping/',
-                {target: 'google.com', port: '80'},
-                true
+                {target: 'google.com', port: '80'}
             )
 
             expect(result.url).toBe('https://api.example.com/ping/google.com')
@@ -101,11 +100,10 @@ describe('Utils', () => {
         })
 
         test('builds request without target in URL', () => {
-            const result = _buildAPIRequest(
+            const result = buildAPIRequest(
                 'https://api.example.com',
                 '/batch/',
-                {target: 'google.com', port: '80'},
-                false
+                {target: 'google.com', port: '80'}
             )
 
             expect(result.url).toBe('https://api.example.com/batch/')
@@ -113,11 +111,10 @@ describe('Utils', () => {
         })
 
         test('handles missing target gracefully', () => {
-            const result = _buildAPIRequest(
+            const result = buildAPIRequestWithTarget(
                 'https://api.example.com',
                 '/ping/',
-                {port: '80'},
-                true
+                {port: '80'}
             )
 
             expect(result.url).toBe('https://api.example.com/ping/')
@@ -125,11 +122,10 @@ describe('Utils', () => {
         })
 
         test('handles empty formData', () => {
-            const result = _buildAPIRequest(
+            const result = buildAPIRequestWithTarget(
                 'https://api.example.com',
                 '/ping/',
-                {},
-                true
+                {}
             )
 
             expect(result.url).toBe('https://api.example.com/ping/')
