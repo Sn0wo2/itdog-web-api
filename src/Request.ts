@@ -1,14 +1,13 @@
 import {SafeGuardCalculator} from '@/guard/Bridge'
-import type {APIResponse, RequestConfig} from '@/types'
+import type {APIResult, RequestConfig} from '@/types'
 import {_findTaskIdScript, _parseScriptVariables} from '@/utils'
 import {load} from 'cheerio';
 import * as cookie from 'cookie';
 
 
 export class Request {
-    static async makeRequest(config: RequestConfig): Promise<APIResponse> {
-        //eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const fetchClient = (config as any).fetch || fetch;
+    static async makeRequest(config: RequestConfig): Promise<APIResult> {
+        const fetchClient = config.fetch || fetch;
         const response = await fetchClient(config.rawRequest.url, config.rawRequest);
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -59,7 +58,7 @@ export class Request {
         };
     }
 
-    static parseResponse(html: string): APIResponse {
+    static parseResponse(html: string): APIResult {
         const scriptContent = _findTaskIdScript(load(html));
 
         if (!scriptContent) {
@@ -72,6 +71,6 @@ export class Request {
             throw new Error('Invalid response: missing required fields (task_id, wss_url)');
         }
 
-        return variables as APIResponse;
+        return variables as unknown as APIResult
     }
 }

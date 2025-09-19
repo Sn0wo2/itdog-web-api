@@ -8,8 +8,8 @@ export class WebSocketHandler {
     private receivedData: unknown[] = [];
     private isConnected = false;
 
-    async connect(config: WebSocketConfig, onMessage?: (data: unknown) => void): Promise<void> {
-        return new Promise((resolve, reject) => {
+    async connect(config: WebSocketConfig, onMessage?: (data: unknown) => void) {
+        return new Promise<void>((resolve, reject) => {
             this.cleanup();
 
             try {
@@ -28,7 +28,7 @@ export class WebSocketHandler {
             const timeout = setTimeout(() => {
                 if (!this.isConnected) {
                     this.cleanup();
-                    resolve(); // timeout = ok, not an error
+                    resolve();
                 }
             }, config.timeout || 10000);
 
@@ -38,7 +38,7 @@ export class WebSocketHandler {
                     try {
                         this.websocket?.send(JSON.stringify(config.initialMessage));
                     } catch {
-                        // ignore send errors, connection still works
+                        // ignore
                     }
                 }
             };

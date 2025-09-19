@@ -1,5 +1,13 @@
 import {Client} from '@/Client.ts'
-import type {BatchTCPingParams, DNSParams, HttpParams, PingParams, TCPingParams, TraceRouteParams} from '@/types.ts'
+import type {
+    BatchTCPingParams,
+    DNSParams,
+    FinalResponse,
+    HTTPingParams,
+    PingParams,
+    TCPingParams,
+    TraceRouteParams
+} from '@/types.ts'
 
 interface TestConfig {
     name: string
@@ -29,7 +37,7 @@ class TestRunner {
 
             console.warn(`=== Testing ${test.name} ===`)
             try {
-                let result
+                let result: FinalResponse
                 switch (test.name.toLowerCase()) {
                 case 'ping':
                     result = await this.client.ping(test.params as PingParams, this.defaultMessageHandler)
@@ -41,7 +49,7 @@ class TestRunner {
                     result = await this.client.batchTCPing(test.params as BatchTCPingParams, this.defaultMessageHandler)
                     break
                 case 'http':
-                    result = await this.client.http(test.params as HttpParams, this.defaultMessageHandler)
+                    result = await this.client.http(test.params as HTTPingParams, this.defaultMessageHandler)
                     break
                 case 'trace route':
                     result = await this.client.traceRoute(test.params as TraceRouteParams, this.defaultMessageHandler)
@@ -52,7 +60,7 @@ class TestRunner {
                 default:
                     throw new Error(`Unknown test type: ${test.name}`)
                 }
-                console.warn('Final result:', result)
+                console.warn('Final result:', result.result)
             } catch (error) {
                 console.error(`${test.name} test failed:`, error)
             }
@@ -72,12 +80,7 @@ class TestRunner {
 
             console.warn(`=== Testing ${test.name} ===`)
             try {
-                const api = this.client.createAPI({
-                    endpoint: test.endpoint,
-                    method: test.method || 'POST'
-                })
-
-                const result = await api.execute(test.params, this.defaultMessageHandler)
+                const result = await this.client.generic(test.endpoint, test.method || 'POST', test.params, this.defaultMessageHandler)
                 console.warn('Final result:', result)
             } catch (error) {
                 console.error(`${test.name} test failed:`, error)
@@ -98,12 +101,12 @@ const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     {
         name: 'Ping',
         enabled: false,
-        params: {target: 'baidu.com'}
+        params: {target: 'www.baidu.com'}
     },
     {
         name: 'TCPing',
-        enabled: false,
-        params: {target: 'openrouter.ai', port: '443'}
+        enabled: true,
+        params: {target: 'www.baidu.com', port: '443'}
     },
     {
         name: 'Batch TCPing',
@@ -144,7 +147,7 @@ const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     },
     {
         name: 'DNS',
-        enabled: true,
+        enabled: false,
         params: {
             target: 'www.baidu.com',
             line: '',
@@ -158,7 +161,7 @@ const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
 const DEFAULT_GENERIC_API_TESTS: APITestConfig[] = [
     {
         name: 'Generic API (Ping)',
-        enabled: true,
+        enabled: false,
         endpoint: '/ping/',
         params: {
             target: 'baidu.com',

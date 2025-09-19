@@ -1,43 +1,9 @@
+import {WebSocketHandler} from './WebSocketHandler';
+
 export interface ClientOptions {
     baseURL?: string;
     hashToken?: string;
     fetch?: typeof fetch;
-}
-
-export interface WebSocketMessage {
-    task_id?: string;
-    task_token?: string;
-
-    [key: string]: unknown;
-}
-
-export interface WebSocketConfig {
-    url: string;
-    initialMessage?: WebSocketMessage;
-    timeout?: number;
-    headers?: Record<string, string>;
-}
-
-export interface APIResponse {
-    task_id: string;
-    wss_url: string;
-    rawRequest: RequestInit & {
-        url: string | URL;
-    };
-    rawResponse?: Response;
-
-    [key: string]: unknown;
-}
-
-export interface RequestConfig extends RequestInit {
-    rawRequest: RequestInit & {
-        url: string | URL;
-    };
-    fetch?: typeof fetch;
-}
-
-export interface ExecuteWithWebSocketConfig {
-    formData: Record<string, string>;
 }
 
 export interface APIConfig {
@@ -45,26 +11,53 @@ export interface APIConfig {
     method?: string;
 }
 
-export interface GenericAPIConfig extends Partial<APIConfig> {
-    endpoint: string;
-    method?: string;
-}
-
 export interface APIResult {
-    taskId: string;
+    task_id: string;
+    wss_url: string;
     taskToken: string;
-    wssUrl: string;
-    messages: unknown[];
     nodeIds?: string[];
     availableNodes?: Array<{ id: string; name: string; category: string }>;
+    rawRequest: RawRequest
+    rawResponse: Response;
+}
 
-    forEach(callback: (index: number, item: unknown) => void): void;
+export interface FinalResponse {
+    result: APIResult;
+    wsHandler: WebSocketHandler;
+}
 
-    getMessage(index: number): unknown | undefined;
+export interface APIResponse {
+    wsHandler: WebSocketHandler;
+    readonly result: Promise<APIResult>;
 
-    getMessageCount(): number;
+    execute(onMessage?: (data: unknown) => void): Promise<FinalResponse>;
+}
+
+export interface RawRequest extends RequestInit {
+    url: string | URL;
+}
+
+export interface RequestConfig {
+    rawRequest: RawRequest
+    fetch?: typeof fetch;
+}
+
+export interface WebSocketMessage {
+    task_id: string;
+    task_token: string;
 
     [key: string]: unknown;
+}
+
+export interface WebSocketConfig {
+    url: string;
+    initialMessage: WebSocketMessage;
+    timeout?: number;
+    headers?: Record<string, string>;
+}
+
+export interface ExecuteWithWebSocketConfig {
+    formData: Record<string, string>;
 }
 
 export interface Node {
@@ -73,18 +66,20 @@ export interface Node {
     category: string;
 }
 
-export interface PingParams {
-    target: string;
-    line?: string;
-    dnsServerType?: "isp" | "custom";
+export interface BaseDNSParams {
+    dnsServerType?: 'isp' | 'custom';
     dnsServer?: string;
 }
 
-export interface TCPingParams {
+export interface PingParams extends BaseDNSParams {
     target: string;
     line?: string;
-    dnsServerType?: 'isp' | 'custom',
-    dnsServer?: string,
+}
+
+export interface TCPingParams extends BaseDNSParams {
+    target: string;
+    line?: string;
+    mode?: 'many';
 }
 
 export interface BatchTCPingParams {
@@ -95,36 +90,30 @@ export interface BatchTCPingParams {
     gateway?: string;
 }
 
-export interface HttpParams {
+export interface HTTPingParams extends BaseDNSParams {
     host: string;
     line?: string;
-    checkMode?: 'fast' | 'slow  ';
+    checkMode?: 'fast' | 'slow';
     ipv4?: string;
     method?: 'get' | 'post';
     referer?: string;
     userAgent?: string;
     cookies?: string;
     redirectNum?: number;
-    dnsServerType?: 'isp' | 'custom';
-    dnsServer?: string;
 }
 
-export interface TraceRouteParams {
+export interface TraceRouteParams extends BaseDNSParams {
     target: string;
     node?: string;
-    dnsServerType?: 'isp' | 'custom';
-    dnsServer?: string;
 }
 
-export interface DNSParams {
+export interface DNSParams extends BaseDNSParams {
     target: string;
     line?: string;
     dnsType?: 'a' | 'cname' | 'mx' | 'aaaa' | 'ns' | 'txt' | 'ptr' | 'srv';
-    dnsServerType?: 'isp' | 'custom';
-    dnsServer?: string;
 }
 
-export interface GenericAPIParams {
+export interface GenericParams {
     [key: string]: unknown;
 }
 

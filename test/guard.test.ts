@@ -38,7 +38,9 @@ describe('SafeGuardCalculator', () => {
 
             expect(typeof result).toBe('string')
             expect(result).not.toBeNull()
-            expect(result.length).toBeGreaterThan(0)
+            if (result) {
+                expect(result.length).toBeGreaterThan(0)
+            }
         })
 
         test('handles special characters in guard value', () => {

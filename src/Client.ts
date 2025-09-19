@@ -1,6 +1,6 @@
 import {BatchTCPingAPI} from '@/api/endpoint/BatchTCPingAPI'
 import {DNSAPI} from '@/api/endpoint/DNSAPI'
-import {HttpAPI} from '@/api/endpoint/HttpAPI'
+import {HTTPingAPI} from '@/api/endpoint/HTTPingAPI'
 import {PingAPI} from '@/api/endpoint/PingAPI'
 import {TCPingAPI} from '@/api/endpoint/TCPingAPI'
 import {TraceRouteAPI} from '@/api/endpoint/TraceRouteAPI'
@@ -10,12 +10,14 @@ import type {
     BatchTCPingParams,
     ClientOptions,
     DNSParams,
-    GenericAPIConfig,
-    HttpParams,
+    FinalResponse,
+    GenericParams,
+    HTTPingParams,
     PingParams,
     TCPingParams,
     TraceRouteParams
-} from '@/types'
+} from './types'
+
 
 export class Client {
     private readonly options: ClientOptions;
@@ -27,47 +29,46 @@ export class Client {
         };
     }
 
-    async ping(options: PingParams, onMessage?: (data: unknown) => void) {
-        return new PingAPI(this.options).execute(options, onMessage);
+    async ping(options: PingParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+        return new PingAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
-    async tcping(options: TCPingParams, onMessage?: (data: unknown) => void) {
-        return new TCPingAPI(this.options).execute(options, onMessage);
+    async tcping(options: TCPingParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+        return new TCPingAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
     async batchTCPing(
-        options: BatchTCPingParams,
-        onMessage?: (data: unknown) => void
-    ) {
-        return new BatchTCPingAPI(this.options).execute(options, onMessage);
+        options: BatchTCPingParams, onMessage?: (data: unknown) => void
+    ): Promise<FinalResponse> {
+        return new BatchTCPingAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
-    async http(options: HttpParams, onMessage?: (data: unknown) => void) {
-        return new HttpAPI(this.options).execute(options, onMessage);
+
+    async http(options: HTTPingParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+        return new HTTPingAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
-    async traceRoute(options: TraceRouteParams, onMessage?: (data: unknown) => void) {
-        return new TraceRouteAPI(this.options).execute(options, onMessage);
+    async httping(options: HTTPingParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+        return new HTTPingAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
-    async dns(options: DNSParams, onMessage?: (data: unknown) => void) {
-        return new DNSAPI(this.options).execute(options, onMessage);
+    async traceRoute(options: TraceRouteParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+        return new TraceRouteAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
+    }
+
+    async dns(options: DNSParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+        return new DNSAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
     async generic(
         endpoint: string,
-        params: Record<string, unknown> = {},
         method: string = 'POST',
+        params: GenericParams,
         onMessage?: (data: unknown) => void
-    ) {
-        const config: GenericAPIConfig = {
+    ): Promise<FinalResponse> {
+        return new GenericAPI({
             endpoint,
             method
-        };
-        return new GenericAPI(this.options, config).execute(params, onMessage);
-    }
-
-    createAPI(config: GenericAPIConfig) {
-        return new GenericAPI(this.options, config);
+        }).setOptions(this.options).setParams(params).request().execute(onMessage);
     }
 }
