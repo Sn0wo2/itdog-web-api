@@ -1,8 +1,8 @@
-export {Client} from '@/Client.js'
-export * from '@/types.js'
+export {Client} from '@/Client'
+export * from '@/types'
 export {
     getAllNodes,
     getNodesByCategory,
     getRandomNodes,
     getDefaultNodes
-} from '@/data/nodes.js'
+} from '@/data/nodes'
