@@ -32,7 +32,7 @@
     "ws": "^8.18.3"
   },
   "devDependencies": {
-    "@commitlint/types": "^19.8.1",
+    "@commitlint/types": "^20.0.0",
     "@eslint/js": "^9.35.0",
     "@types/node": "^24.5.2",
     "@types/ws": "^8.18.1",
