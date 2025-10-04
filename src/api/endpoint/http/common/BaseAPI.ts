@@ -8,7 +8,7 @@ export abstract class BaseAPI {
         this.options = options
     }
 
-    protected setOptions(options: ClientOptions): this {
+    public setOptions(options: ClientOptions): this {
         this.options = options
         return this
     }

@@ -17,12 +17,12 @@ export abstract class BaseWSAPI<T = Record<string, unknown>> extends BaseAPI {
         this.wsHandler = new WebSocketHandler();
     }
 
-    protected setParams(params: T): this {
+    public setParams(params: T): this {
         this.params = params;
         return this;
     }
 
-    protected request(): WSResponse {
+    public request(): WSResponse {
         if (!this.options) {
             throw new Error("Options must be set before calling request");
         }
