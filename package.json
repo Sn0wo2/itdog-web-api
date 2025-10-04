@@ -9,13 +9,13 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint:fix": "eslint . --fix && tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "example": "tsx example/test.ts",
     "example:fetch": "tsx example/fetch-client-test.ts",
-    "prepublishOnly": "pnpm run lint && pnpm run test && pnpm run build"
+    "prepublishOnly": "pnpm run lint:fix && pnpm run test && pnpm run build"
   },
   "keywords": [
     "ping",
