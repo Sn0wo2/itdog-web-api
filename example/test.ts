@@ -1,4 +1,4 @@
-import {Client} from '@/Client.ts'
+import {Client} from '@/Client'
 import type {
     BatchTCPingParams,
     DNSParams,
@@ -7,7 +7,7 @@ import type {
     PingParams,
     TCPingParams,
     TraceRouteParams
-} from '@/types.ts'
+} from '@/types'
 
 interface TestConfig {
     name: string
