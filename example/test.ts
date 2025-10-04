@@ -2,7 +2,7 @@ import {Client} from '@/Client.ts'
 import type {
     BatchTCPingParams,
     DNSParams,
-    FinalResponse,
+    FinalWSResponse,
     HTTPingParams,
     PingParams,
     TCPingParams,
@@ -37,24 +37,24 @@ class TestRunner {
 
             console.warn(`=== Testing ${test.name} ===`)
             try {
-                let result: FinalResponse
-                switch (test.name.toLowerCase()) {
-                case 'ping':
+                let result: FinalWSResponse
+                switch (test.name.toUpperCase().replaceAll(" ", "_")) {
+                case 'PING':
                     result = await this.client.ping(test.params as PingParams, this.defaultMessageHandler)
                     break
-                case 'tcping':
+                case 'TCPING':
                     result = await this.client.tcping(test.params as TCPingParams, this.defaultMessageHandler)
                     break
-                case 'batch tcping':
+                case 'BATCH_TCPING':
                     result = await this.client.batchTCPing(test.params as BatchTCPingParams, this.defaultMessageHandler)
                     break
-                case 'http':
+                case 'HTTP':
                     result = await this.client.http(test.params as HTTPingParams, this.defaultMessageHandler)
                     break
-                case 'trace route':
+                case 'TRACE_ROUTE':
                     result = await this.client.traceRoute(test.params as TraceRouteParams, this.defaultMessageHandler)
                     break
-                case 'dns':
+                case 'DNS':
                     result = await this.client.dns(test.params as DNSParams, this.defaultMessageHandler)
                     break
                 default:
@@ -81,9 +81,9 @@ class TestRunner {
             console.warn(`=== Testing ${test.name} ===`)
             try {
                 const result = await this.client.generic(test.endpoint, test.method || 'POST', test.params, this.defaultMessageHandler)
-                console.warn('Final result:', result)
+                console.warn(`${test.name} Result:`, result)
             } catch (error) {
-                console.error(`${test.name} test failed:`, error)
+                console.error(`${test.name} Failed:`, error)
             }
 
             if (i < tests.length - 1) {
@@ -93,14 +93,14 @@ class TestRunner {
     }
 
     private readonly defaultMessageHandler = (data: any) => {
-        console.debug('Real-time data:', data)
+        console.debug('Handler Data:', data)
     }
 }
 
 const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     {
         name: 'Ping',
-        enabled: false,
+        enabled: true,
         params: {target: 'www.baidu.com'}
     },
     {
@@ -110,7 +110,7 @@ const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     },
     {
         name: 'Batch TCPing',
-        enabled: false,
+        enabled: true,
         params: {
             hosts: ['www.baidu.com', 'www.google.com'],
             port: '443',
@@ -120,7 +120,7 @@ const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     },
     {
         name: 'HTTP',
-        enabled: false,
+        enabled: true,
         params: {
             line: '',
             host: 'https://www.baidu.com',
@@ -138,7 +138,7 @@ const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     },
     {
         name: 'Trace Route',
-        enabled: false,
+        enabled: true,
         params: {
             host: 'www.baidu.com',
             dns_server_type: 'isp',
@@ -147,7 +147,7 @@ const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
     },
     {
         name: 'DNS',
-        enabled: false,
+        enabled: true,
         params: {
             target: 'www.baidu.com',
             line: '',
@@ -161,7 +161,7 @@ const DEFAULT_SIMPLE_TESTS: TestConfig[] = [
 const DEFAULT_GENERIC_API_TESTS: APITestConfig[] = [
     {
         name: 'Generic API (Ping)',
-        enabled: false,
+        enabled: true,
         endpoint: '/ping/',
         params: {
             target: 'baidu.com',
@@ -179,9 +179,9 @@ const testRunner = new TestRunner(client)
 async function runAllTests() {
     await testRunner.runSimpleTests(DEFAULT_SIMPLE_TESTS)
 
-    console.warn('\n' + '='.repeat(50) + '\n')
+    console.warn('='.repeat(50))
 
     await testRunner.runGenericAPITests(DEFAULT_GENERIC_API_TESTS)
 }
 
-runAllTests().catch(console.error)
+await runAllTests().catch(console.error)
