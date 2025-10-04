@@ -11,28 +11,6 @@ export interface APIConfig {
     method?: string;
 }
 
-export interface APIResult {
-    task_id: string;
-    wss_url: string;
-    taskToken: string;
-    nodeIds?: string[];
-    availableNodes?: Array<{ id: string; name: string; category: string }>;
-    rawRequest: RawRequest
-    rawResponse: Response;
-}
-
-export interface FinalResponse {
-    result: APIResult;
-    wsHandler: WebSocketHandler;
-}
-
-export interface APIResponse {
-    wsHandler: WebSocketHandler;
-    readonly result: Promise<APIResult>;
-
-    execute(onMessage?: (data: unknown) => void): Promise<FinalResponse>;
-}
-
 export interface RawRequest extends RequestInit {
     url: string | URL;
 }
@@ -40,6 +18,41 @@ export interface RawRequest extends RequestInit {
 export interface RequestConfig {
     rawRequest: RawRequest
     fetch?: typeof fetch;
+}
+
+export interface RawResponse {
+    rawRequest: RawRequest
+    rawResponse: Response
+}
+
+export interface APIResult {
+    task_id: string;
+    wss_url?: string;
+    taskToken?: string;
+    rawRequest: RawRequest
+    rawResponse: Response;
+}
+
+export interface APIResponse {
+    readonly result: Promise<APIResult>;
+
+    execute(): Promise<FinalAPIResponse>;
+}
+
+export interface FinalAPIResponse {
+    result: APIResult;
+}
+
+export interface WSResponse {
+    wsHandler: WebSocketHandler;
+    readonly result: Promise<APIResult>;
+
+    execute(onMessage?: (data: unknown) => void): Promise<FinalWSResponse>;
+}
+
+export interface FinalWSResponse {
+    result: APIResult;
+    wsHandler: WebSocketHandler;
 }
 
 export interface WebSocketMessage {
@@ -56,14 +69,18 @@ export interface WebSocketConfig {
     headers?: Record<string, string>;
 }
 
-export interface ExecuteWithWebSocketConfig {
-    formData: Record<string, string>;
-}
-
 export interface Node {
     id: string;
     name: string;
     category: string;
+}
+
+export interface BaseAjaxParams {
+    type: string
+}
+
+export interface FindPingParams extends BaseAjaxParams {
+    type: 'find_ping'
 }
 
 export interface BaseDNSParams {

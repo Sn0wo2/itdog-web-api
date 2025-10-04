@@ -1,12 +1,12 @@
 import type {
-    APIResponse,
     ClientOptions,
     DNSParams,
     HTTPingParams,
     PingParams,
     TCPingParams,
     TraceRouteParams,
-    WebSocketMessage
+    WebSocketMessage,
+    WSResponse
 } from '@/types'
 import {describe, expect, test, vi} from 'vitest'
 
@@ -62,7 +62,7 @@ describe('Types', () => {
                 wss_url: 'wss://example.com'
             } as any
 
-            const response: APIResponse = {
+            const response: WSResponse = {
                 wsHandler: mockWsHandler,
                 result: Promise.resolve(mockApiResult),
                 execute: vi.fn()

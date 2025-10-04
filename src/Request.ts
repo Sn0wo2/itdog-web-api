@@ -1,19 +1,24 @@
 import {SafeGuardCalculator} from '@/guard/Bridge'
-import type {APIResult, RequestConfig} from '@/types'
+import type {APIResult, RawResponse, RequestConfig} from '@/types'
 import {_findTaskIdScript, _parseScriptVariables} from '@/utils'
 import {load} from 'cheerio';
 import * as cookie from 'cookie';
 
 
 export class Request {
-    static async makeRequest(config: RequestConfig): Promise<APIResult> {
+    static async makeRawRequest(config: RequestConfig): Promise<RawResponse> {
         const fetchClient = config.fetch || fetch;
-        const response = await fetchClient(config.rawRequest.url, config.rawRequest);
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+        return {
+            rawRequest: config.rawRequest,
+            rawResponse: await fetchClient(config.rawRequest.url, config.rawRequest)
+        };
+    }
 
-        const html = await response.text();
+    static async makeGuardRequest(config: RequestConfig): Promise<RawResponse> {
+        const rawResponse = await this.makeRawRequest(config)
+        const response = rawResponse.rawResponse
+
+        const html = await response.text()
         if (html === `<script src="/_guard/auto.js"></script>`) {
             const guard = response.headers
                 .getSetCookie()
@@ -36,7 +41,7 @@ export class Request {
                 .map(([key, value]) => cookie.serialize(key, value as string))
                 .join('; ');
 
-            return this.makeRequest({
+            return this.makeGuardRequest({
                 ...config,
                 rawRequest: {
                     ...config.rawRequest,
@@ -47,14 +52,25 @@ export class Request {
                 }
             });
         }
-
         return {
-            ...this.parseResponse(html),
-            rawRequest: config.rawRequest,
+            rawRequest: rawResponse.rawRequest,
             rawResponse: {
                 ...response,
                 text: async () => html
             }
+        };
+    }
+
+
+    static async makeTaskRequest(config: RequestConfig): Promise<APIResult> {
+        const rawResponse = await this.makeGuardRequest(config)
+        const response = rawResponse.rawResponse
+
+        const html = await response.text();
+
+        return {
+            ...this.parseResponse(html),
+            ...rawResponse
         };
     }
 
@@ -67,8 +83,8 @@ export class Request {
 
         const variables = _parseScriptVariables(scriptContent);
 
-        if (!variables.task_id || !variables.wss_url) {
-            throw new Error('Invalid response: missing required fields (task_id, wss_url)');
+        if (!variables.task_id) {
+            throw new Error('Invalid response: missing required fields (task_id)');
         }
 
         return variables as unknown as APIResult

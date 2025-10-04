@@ -1,9 +1,9 @@
-import {BaseAPI} from '@/api/BaseAPI'
+import {BaseWSAPI} from '@/api/endpoint/ws/common/BaseWSAPI'
 import {getRandomNodes, updateNodesFromHtml} from '@/data/nodes'
 import type {APIResult, TraceRouteParams} from '@/types'
 import {buildAPIRequestWithTarget} from '@/utils'
 
-export class TraceRouteAPI extends BaseAPI<TraceRouteParams> {
+export class TraceRouteAPI extends BaseWSAPI<TraceRouteParams> {
     constructor() {
         super({
             endpoint: 'traceroute/'
@@ -11,8 +11,8 @@ export class TraceRouteAPI extends BaseAPI<TraceRouteParams> {
     }
 
 
-    async _makeHttpRequest(formData: Record<string, string>): Promise<APIResult> {
-        const response = await super._makeHttpRequest(formData);
+    async _makeHTTPRequest(formData: Record<string, string>): Promise<APIResult> {
+        const response = await super._makeHTTPRequest(formData);
 
         updateNodesFromHtml(await response?.rawResponse.text());
 

@@ -1,9 +1,9 @@
-import {BaseAPI} from '@/api/BaseAPI'
+import {BaseWSAPI} from '@/api/endpoint/ws/common/BaseWSAPI'
 import type {PingParams} from '@/types'
 import {buildAPIRequestWithTarget} from '@/utils'
 
 
-export class PingAPI extends BaseAPI<PingParams> {
+export class PingAPI extends BaseWSAPI<PingParams> {
     constructor() {
         super({
             endpoint: 'ping/'

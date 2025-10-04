@@ -1,17 +1,17 @@
-import {BaseAPI} from '@/api/BaseAPI'
+import {BaseWSAPI} from '@/api/endpoint/ws/common/BaseWSAPI'
 import {getRandomNodes, updateNodesFromHtml} from '@/data/nodes'
 import type {APIResult, BatchTCPingParams} from '@/types'
 import {buildAPIRequest} from "@/utils";
 
-export class BatchTCPingAPI extends BaseAPI<BatchTCPingParams> {
+export class BatchTCPingAPI extends BaseWSAPI<BatchTCPingParams> {
     constructor() {
         super({
             endpoint: 'batch_tcping'
         });
     }
 
-    async _makeHttpRequest(formData: Record<string, string>): Promise<APIResult> {
-        const response = await super._makeHttpRequest(formData);
+    async _makeHTTPRequest(formData: Record<string, string>): Promise<APIResult> {
+        const response = await super._makeHTTPRequest(formData);
 
         if (response.rawResponse) {
             updateNodesFromHtml(await response.rawResponse.text());

@@ -1,16 +1,16 @@
-import {BatchTCPingAPI} from '@/api/endpoint/BatchTCPingAPI'
-import {DNSAPI} from '@/api/endpoint/DNSAPI'
-import {HTTPingAPI} from '@/api/endpoint/HTTPingAPI'
-import {PingAPI} from '@/api/endpoint/PingAPI'
-import {TCPingAPI} from '@/api/endpoint/TCPingAPI'
-import {TraceRouteAPI} from '@/api/endpoint/TraceRouteAPI'
-import {GenericAPI} from '@/api/GenericAPI'
+import {BatchTCPingAPI} from '@/api/endpoint/ws/BatchTCPingAPI'
+import {GenericWSAPI} from '@/api/endpoint/ws/common/GenericWSAPI'
+import {DNSAPI} from '@/api/endpoint/ws/DNSAPI'
+import {HTTPingAPI} from '@/api/endpoint/ws/HTTPingAPI'
+import {PingAPI} from '@/api/endpoint/ws/PingAPI'
+import {TCPingAPI} from '@/api/endpoint/ws/TCPingAPI'
+import {TraceRouteAPI} from '@/api/endpoint/ws/TraceRouteAPI'
 import {API_BASE_URL} from '@/data/const'
 import type {
     BatchTCPingParams,
     ClientOptions,
     DNSParams,
-    FinalResponse,
+    FinalWSResponse,
     GenericParams,
     HTTPingParams,
     PingParams,
@@ -29,34 +29,34 @@ export class Client {
         };
     }
 
-    async ping(options: PingParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+    async ping(options: PingParams, onMessage?: (data: unknown) => void): Promise<FinalWSResponse> {
         return new PingAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
-    async tcping(options: TCPingParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+    async tcping(options: TCPingParams, onMessage?: (data: unknown) => void): Promise<FinalWSResponse> {
         return new TCPingAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
     async batchTCPing(
         options: BatchTCPingParams, onMessage?: (data: unknown) => void
-    ): Promise<FinalResponse> {
+    ): Promise<FinalWSResponse> {
         return new BatchTCPingAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
 
-    async http(options: HTTPingParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+    async http(options: HTTPingParams, onMessage?: (data: unknown) => void): Promise<FinalWSResponse> {
         return new HTTPingAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
-    async httping(options: HTTPingParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+    async httping(options: HTTPingParams, onMessage?: (data: unknown) => void): Promise<FinalWSResponse> {
         return new HTTPingAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
-    async traceRoute(options: TraceRouteParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+    async traceRoute(options: TraceRouteParams, onMessage?: (data: unknown) => void): Promise<FinalWSResponse> {
         return new TraceRouteAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
-    async dns(options: DNSParams, onMessage?: (data: unknown) => void): Promise<FinalResponse> {
+    async dns(options: DNSParams, onMessage?: (data: unknown) => void): Promise<FinalWSResponse> {
         return new DNSAPI().setOptions(this.options).setParams(options).request().execute(onMessage);
     }
 
@@ -65,8 +65,8 @@ export class Client {
         method: string = 'POST',
         params: GenericParams,
         onMessage?: (data: unknown) => void
-    ): Promise<FinalResponse> {
-        return new GenericAPI({
+    ): Promise<FinalWSResponse> {
+        return new GenericWSAPI({
             endpoint,
             method
         }).setOptions(this.options).setParams(params).request().execute(onMessage);

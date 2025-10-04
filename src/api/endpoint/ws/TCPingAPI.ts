@@ -1,9 +1,9 @@
-import {BaseAPI} from '@/api/BaseAPI'
+import {BaseWSAPI} from '@/api/endpoint/ws/common/BaseWSAPI'
 import type {TCPingParams} from '@/types'
 import {buildAPIRequestWithTarget} from '@/utils'
 
 
-export class TCPingAPI extends BaseAPI<TCPingParams> {
+export class TCPingAPI extends BaseWSAPI<TCPingParams> {
     constructor() {
         super({
             endpoint: 'tcping/'

@@ -1,8 +1,8 @@
-import {BaseAPI} from '@/api/BaseAPI'
+import {BaseWSAPI} from '@/api/endpoint/ws/common/BaseWSAPI'
 import type {HTTPingParams} from '@/types'
 import {buildAPIRequest} from '@/utils'
 
-export class HTTPingAPI extends BaseAPI<HTTPingParams> {
+export class HTTPingAPI extends BaseWSAPI<HTTPingParams> {
     constructor() {
         super({
             endpoint: 'http'

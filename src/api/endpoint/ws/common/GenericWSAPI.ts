@@ -1,8 +1,8 @@
-import {BaseAPI} from '@/api/BaseAPI'
+import {BaseWSAPI} from '@/api/endpoint/ws/common/BaseWSAPI'
 import type {APIConfig, GenericParams} from '@/types'
 
 
-export class GenericAPI extends BaseAPI<GenericParams> {
+export class GenericWSAPI extends BaseWSAPI<GenericParams> {
     constructor(config: APIConfig) {
         super(config);
 

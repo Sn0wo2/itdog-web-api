@@ -1,19 +1,21 @@
-import {BaseAPI} from '@/api/BaseAPI'
-import type {DNSParams} from '@/types'
-import {buildAPIRequestWithTarget} from "@/utils";
+import {BaseWSAPI} from '@/api/endpoint/ws/common/BaseWSAPI'
+import type {TCPingParams} from '@/types'
+import {buildAPIRequestWithTarget} from '@/utils'
 
-export class DNSAPI extends BaseAPI<DNSParams> {
+
+export class TCPingAPI extends BaseWSAPI<TCPingParams> {
     constructor() {
         super({
-            endpoint: 'dns/'
+            endpoint: 'tcping/'
         });
     }
 
-    protected prepareFormData(params: DNSParams): Record<string, string | undefined | null> {
+    protected prepareFormData(params: TCPingParams): Record<string, string | undefined | null> {
         return {
             target: params.target,
             line: params.line || '',
-            dns_type: params.dnsType || 'a',
+            button_click: 'yes',
+            mode: params.mode || null,
             dns_server_type: params.dnsServerType || 'isp',
             dns_server: params.dnsServerType === 'custom' && params.dnsServer ? params.dnsServer : ''
         };
