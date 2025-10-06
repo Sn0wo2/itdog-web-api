@@ -24,17 +24,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Clean dependencies
-        run: pnpm prune & pnpm dedupe
-
-      - name: Run tests
-        run: pnpm run test
-
-      - name: Run linter
-        run: pnpm run lint:fix
-
-      - name: Build
-        run: pnpm run build
+      - name: Run prepublishOnly
+        run: pnpm run prepublishOnly
 
       - name: Check for file changes
         id: git-check
