@@ -10,7 +10,6 @@
     "declaration": true,
     "sourceMap": true,
     "resolveJsonModule": true,
-    "declarationDir": "dist",
     "baseUrl": ".",
     "paths": {
       "@/*": [
