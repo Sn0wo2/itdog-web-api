@@ -17,13 +17,10 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
         with:
           version: latest
-
-      - name: Install dependencies
-        run: pnpm install
+          run_install: true
 
       - name: Run prepublishOnly
         run: pnpm run prepublishOnly
