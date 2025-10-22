@@ -22,7 +22,13 @@ export abstract class BaseWSAPI<T = Record<string, unknown>> extends BaseAPI {
         return this;
     }
 
-    public request(): WSResponse {
+    public async execute(params: T, onMessage?: (data: unknown) => void): Promise<FinalWSResponse> {
+        this.setParams(params);
+        const response = this.request();
+        return response.execute(onMessage);
+    }
+
+    protected request(): WSResponse {
         if (!this.options) {
             throw new Error("Options must be set before calling request");
         }

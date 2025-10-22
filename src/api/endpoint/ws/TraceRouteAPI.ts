@@ -1,9 +1,9 @@
 import {BaseTraceRouteAPI} from '@/api/endpoint/ws/common/BaseTraceRouteAPI'
 
 export class TraceRouteAPI extends BaseTraceRouteAPI {
-    constructor() {
+    constructor(useIPv6: boolean = false) {
         super({
-            endpoint: 'traceroute/'
+            endpoint: useIPv6 ? 'traceroute_ipv6/' : 'traceroute/'
         });
     }
 }
