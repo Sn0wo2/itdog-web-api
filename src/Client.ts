@@ -91,7 +91,8 @@ export class Client {
             method
         })
         api.setOptions(this.options)
-        return api.execute(params, onMessage)
+        api.setParams(params)
+        return api.execute(onMessage)
     }
 
     private _createAPI<T extends BaseWSAPI<P>, P>(
@@ -102,6 +103,7 @@ export class Client {
     ): Promise<FinalWSResponse> {
         const apiInstance = new apiClass(useIPv6);
         apiInstance.setOptions(this.options);
-        return apiInstance.execute(params, onMessage);
+        apiInstance.setParams(params);
+        return apiInstance.execute(onMessage);
     }
 }

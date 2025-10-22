@@ -22,8 +22,7 @@ export abstract class BaseWSAPI<T = Record<string, unknown>> extends BaseAPI {
         return this;
     }
 
-    public async execute(params: T, onMessage?: (data: unknown) => void): Promise<FinalWSResponse> {
-        this.setParams(params);
+    public async execute(onMessage?: (data: unknown) => void): Promise<FinalWSResponse> {
         const response = this.request();
         return response.execute(onMessage);
     }
